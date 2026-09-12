@@ -23,11 +23,10 @@ body.tray-on{padding-bottom:76px}
 button{font-family:var(--ui)}
 a{color:inherit}
 
-/* halka film-grain — poore page par ek jaisa texture */
+/* halka film-grain */
 body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.45;mix-blend-mode:multiply;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0.35 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");}
 
-/* clapper-stripe (clapstick) — top par signature strip */
 .clapstrip{height:12px;border-bottom:2px solid var(--ink);
   background:repeating-linear-gradient(45deg,var(--ink) 0 14px,var(--paper-2) 14px 28px);}
 
@@ -65,10 +64,15 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
   padding:20px 22px;margin-top:14px}
 .kp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
 .kp-grid label{display:flex;flex-direction:column;gap:7px;font:600 10px var(--ui);letter-spacing:.18em;color:var(--ink-2)}
-.kp-grid input{font:14px var(--mono);padding:10px 12px;border:1px solid rgba(25,23,19,.4);background:var(--paper);color:var(--ink);caret-color:var(--red)}
-.kp-grid input:focus{outline:0;border-color:var(--red)}
+.kp-grid label.wide{grid-column:1/-1}
+.kp-grid input,.kp-grid textarea{font:14px var(--mono);padding:10px 12px;border:1px solid rgba(25,23,19,.4);
+  background:var(--paper);color:var(--ink);caret-color:var(--red)}
+.kp-grid textarea{resize:vertical;min-height:84px;line-height:1.6}
+.kp-grid input:focus,.kp-grid textarea:focus{outline:0;border-color:var(--red)}
 .kp-note{font:12.5px/1.7 var(--ui);color:var(--ink-2);margin-top:16px;border-top:1px dashed rgba(25,23,19,.3);padding-top:12px}
 .kp-note a{color:var(--red)}
+.keys-status{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;
+  font:700 11px var(--mono);letter-spacing:.04em;color:var(--ink-2)}
 
 /* ============ Workflow steps ============ */
 .steps{display:flex;align-items:center;gap:14px;margin:30px 0 34px;flex-wrap:wrap}
@@ -79,7 +83,7 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
 .step.done .no{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .srule{flex:1;min-width:16px;height:1px;background:rgba(25,23,19,.25)}
 
-/* ============ Script sheet (screenplay page) ============ */
+/* ============ Script sheet ============ */
 .sheet{position:relative;background:var(--paper-2);border:1px solid var(--ink);box-shadow:8px 8px 0 rgba(25,23,19,.12)}
 .sheethead{display:flex;justify-content:space-between;align-items:center;padding:13px 20px;
   border-bottom:1px solid rgba(25,23,19,.2);font:600 10.5px var(--ui);letter-spacing:.22em;color:var(--ink)}
@@ -97,7 +101,7 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
 .sample-link{font:600 11px var(--ui);letter-spacing:.16em;color:var(--ink);background:0;border:0;border-bottom:1px solid var(--ink);
   cursor:pointer;padding:2px 0;width:max-content;transition:.15s}
 .sample-link:hover{color:var(--red);border-color:var(--red)}
-.hint{font:12px/1.6 var(--ui);color:var(--ink-2);max-width:52ch}
+.hint{font:12px/1.6 var(--ui);color:var(--ink-2);max-width:56ch}
 .hint b{color:var(--ink)}
 
 /* ============ Results header ============ */
@@ -130,7 +134,7 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
   color:var(--ink);cursor:pointer;transition:.15s;flex:none}
 .ibtn:hover{background:var(--red);border-color:var(--red);color:var(--paper)}
 
-/* filmstrip — sprocket holes ke sath */
+/* filmstrip */
 .stripwrap{position:relative;background:var(--film);border-top:1px solid var(--ink);border-bottom:1px solid var(--ink)}
 .fs-prock{position:absolute;left:0;right:0;height:9px;opacity:.8;pointer-events:none;
   background-image:radial-gradient(circle at center,#EFE9DC 0 3px,transparent 3.7px);background-size:26px 9px}
@@ -174,18 +178,22 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
   font:10.5px var(--mono);color:rgba(242,237,227,.65)}
 .stamp{border:1px solid rgba(242,237,227,.5);padding:2px 6px;letter-spacing:.14em;font-weight:700;color:rgba(242,237,227,.9)}
 
-/* sources row */
-.srcrow{display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding:11px 24px 14px;
+/* sources row + chips */
+.srcrow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:11px 24px 14px;
   border-top:1px solid rgba(25,23,19,.15);font:11px var(--mono);letter-spacing:.06em;color:var(--ink-2)}
-.srcrow b{color:var(--ink)}
-.srclink{margin-right:auto;display:inline-flex;align-items:center;gap:5px;color:var(--ink);
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-right:auto}
+.chip{font:10px var(--mono);letter-spacing:.04em;border:1px solid rgba(25,23,19,.28);padding:3px 7px;color:var(--ink-2);white-space:nowrap}
+.chip.ok{border-color:#4A6741;color:#4A6741}
+.chip.bad{border-color:var(--red);color:var(--red)}
+.chip.idle{opacity:.7}
+.srclink{display:inline-flex;align-items:center;gap:5px;color:var(--ink);
   text-decoration:underline;text-underline-offset:4px;font-weight:700}
 .srclink:hover{color:var(--red)}
 .retry{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font:700 10px var(--ui);letter-spacing:.16em;
   border:1px solid var(--red);color:var(--red);background:transparent;padding:5px 9px;cursor:pointer;transition:.15s}
 .retry:hover{background:var(--red);color:var(--paper)}
 
-/* ============ Processing overlay — film leader countdown ============ */
+/* ============ Processing overlay ============ */
 #overlay{position:fixed;inset:0;z-index:100;background:#0F0E0C;color:var(--paper);
   display:flex;align-items:center;justify-content:center;gap:70px;padding:30px;
   visibility:hidden;opacity:0;transition:opacity .4s,visibility .4s;overflow:hidden}
@@ -267,7 +275,7 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
   </div>
   <div class="mright">
     <span id="tally" class="tally" title="Processing indicator"></span>
-    <button id="keyBtn" class="btn ghost sm"><span class="ic" data-icon="key"></span>API KEYS<span id="keyBadge" class="badge miss" title="Gemini key set nahi hai"></span></button>
+    <button id="keyBtn" class="btn ghost sm"><span class="ic" data-icon="key"></span><span id="keyCount">API KEYS</span><span id="keyBadge" class="badge miss" title="Gemini key set nahi hai"></span></button>
   </div>
 </header>
 
@@ -275,18 +283,23 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
 <section class="wrap">
   <div id="keyPanel" class="keypanel hidden">
     <div class="kp-grid">
-      <label>GEMINI — REQUIRED (GOOGLE AI STUDIO)<input type="password" id="kGemini" placeholder="Apni Gemini API key paste karein" autocomplete="off"></label>
+      <label class="wide">GEMINI KEYS (AI STUDIO) — BULK, HAR LINE PAR EK KEY — JITNI CHAHEN
+        <textarea id="kKeys" rows="4" spellcheck="false" autocomplete="off" placeholder="AIzaSy...key1&#10;AIzaSy...key2&#10;AIzaSy...key3&#10;(jitni keys hain, utni lines — fail hone par tool khud agli key par jump karega)"></textarea>
+      </label>
       <label>PEXELS — OPTIONAL<input type="password" id="kPexels" placeholder="pexels.com/api se free key" autocomplete="off"></label>
       <label>PIXABAY — OPTIONAL<input type="password" id="kPixabay" placeholder="pixabay.com/api/docs se free key" autocomplete="off"></label>
       <label>GEMINI MODEL — OPTIONAL<input type="text" id="kModel" placeholder="khaali = auto (latest flash)" autocomplete="off" spellcheck="false"></label>
     </div>
+    <div class="keys-status" id="keysStatus"></div>
     <p class="kp-note">
-      Keys sirf aapke browser ke localStorage me save hoti hain — kahin bheji nahi jatin (password fields par double-click karke show/hide kar sakte hain).
+      <b>Gemini key rotation:</b> jitni keys lagai hain, har breakdown request ke liye pehli key se shuru hota hai —
+      agar key fail ho (quota khatam / rate limit / busy / invalid) to <b>khud agli key</b> par jump, phir agli… jab tak kaam na ban jaye.
+      Sab keys fail ho jayen to thori der baad poori list dobara try hoti hai (2 rounds). Keys sirf aapke browser ke localStorage me rehti hain.
       Gemini key <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio</a> se,
-      Pexels key <a href="https://www.pexels.com/api/" target="_blank" rel="noopener">pexels.com/api</a> se aur
+      Pexels key <a href="https://www.pexels.com/api/" target="_blank" rel="noopener">pexels.com/api</a> se,
       Pixabay key <a href="https://pixabay.com/api/docs/" target="_blank" rel="noopener">pixabay.com/api/docs</a> se free milti hai.
-      Pinterest ki koi public video-search API nahi hoti, is liye har scene ke sath direct Pinterest search link diya jata hai.
-      <b>Model field khaali chhoren</b> — tool aapki key par jo latest flash model available ho, khud pakar leta hai (deprecation ka masla khatam).
+      <b>Clip sources ka chain:</b> PEXELS → PIXABAY → WIKIMEDIA COMMONS (keyless) → INTERNET ARCHIVE (keyless) — jo API fail ho, agli.
+      Pinterest ki public API nahi hoti — direct search link milta hai. Model field khaali chhoren — har key par available latest flash model khud pakra jata hai.
     </p>
   </div>
 </section>
@@ -306,13 +319,13 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
     <div class="sheet">
       <div class="sheethead"><span>VIDEO SCRIPT</span><span class="pg">PG. 01 · REV. A</span></div>
       <div class="margin-line"></div>
-      <textarea id="scriptInput" spellcheck="false" placeholder="Apni complete video script yahan paste karein — English ya koi bhi zubaan.&#10;&#10;AI har scene, sentence aur visual keyword khud identify karega, phir Pexels / Pixabay se matching clips dhoondh dega."></textarea>
+      <textarea id="scriptInput" spellcheck="false" placeholder="Apni complete video script yahan paste karein — English ya koi bhi zubaan.&#10;&#10;AI har scene, sentence aur visual keyword khud identify karega, phir Pexels / Pixabay / Wikimedia / Archive se matching clips dhoondh dega."></textarea>
     </div>
     <div class="wcount" id="wcount"><b>0</b> WORDS · <b>0</b> LINES · AUTOSAVED</div>
     <div class="actionbar">
       <div class="alinks">
         <button class="sample-link" id="btnSample">SAMPLE SCRIPT LOAD KAREIN</button>
-        <p class="hint">Sirf <b>Gemini key zaroori</b> hai. Pexels/Pixabay keys optional hain — lagane par clips tool ke andar hi preview aur download ke sath mil jati hain, warna har scene ke liye direct search links milte hain. Sab kuch aapke browser me hi chalta hai.</p>
+        <p class="hint"><b>Gemini keys bulk mein</b> lagayen (API KEYS → har line par ek) — jo key fail ho, tool khud agli par chala jayega. Pexels/Pixabay optional; Wikimedia + Archive bina key hamesha on. Har scene par chaaron clip APIs try hoti hain.</p>
       </div>
       <button class="btn big" id="btnGo">BREAK DOWN SCRIPT <span class="ic" data-icon="arrow"></span></button>
     </div>
@@ -375,9 +388,9 @@ const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replac
 const escAttr = s => esc(s).replace(/"/g,'&quot;');
 const fmtDur = s => { s=Math.max(0,Math.round(s||0)); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
 const wordCount = s => s.trim()? s.trim().split(/\s+/).length : 0;
+const sleep = ms => new Promise(r=>setTimeout(r,ms));
 
 const PATHS = {
-  play:'<polygon points="6 4 20 12 6 20" fill="currentColor" stroke="none"/>',
   external:'<path d="M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/>',
   download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
   refresh:'<path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/>',
@@ -396,24 +409,59 @@ document.querySelectorAll('[data-icon]').forEach(el => el.innerHTML = I(el.datas
 
 /* ================= state & keys ================= */
 const state = { scenes: [] };
-const selections = new Map();          // sceneNumber -> clipId (ek scene = ek pick)
-const keys = { gemini:'', pexels:'', pixabay:'', model:'' };
+const selections = new Map();
+const keys = { geminiKeys:[], pexels:'', pixabay:'', model:'' };
 
-const kGemini=$('#kGemini'), kPexels=$('#kPexels'), kPixabay=$('#kPixabay'), kModel=$('#kModel');
+const kKeys=$('#kKeys'), kPexels=$('#kPexels'), kPixabay=$('#kPixabay'), kModel=$('#kModel');
+
+/* bulk keys parse — newline, comma ya space se bhi alag ho jayen */
+function parseKeys(txt){
+  return [...new Set(String(txt||'').split(/[\s,;]+/).map(s=>s.trim()).filter(s=>s.length>10))];
+}
 
 function loadKeys(){
-  try{ Object.assign(keys, JSON.parse(localStorage.getItem('cutlist.keys')||'{}')); }catch(_){}
-  kGemini.value=keys.gemini||''; kPexels.value=keys.pexels||''; kPixabay.value=keys.pixabay||'';
-  kModel.value=keys.model||'';
-  updateKeyStatus();
+  try{
+    const s=JSON.parse(localStorage.getItem('cutlist.keys')||'{}');
+    keys.pexels=s.pexels||''; keys.pixabay=s.pixabay||''; keys.model=s.model||'';
+    keys.geminiKeys=Array.isArray(s.geminiKeys)?s.geminiKeys:(s.gemini?[s.gemini]:[]); // purani single-key migrate
+  }catch(_){}
+  kKeys.value=(keys.geminiKeys||[]).join('\n');
+  kPexels.value=keys.pexels||''; kPixabay.value=keys.pixabay||''; kModel.value=keys.model||'';
+  syncKeyStats(); updateKeyStatus();
 }
 function saveKeys(){
-  keys.gemini=kGemini.value.trim(); keys.pexels=kPexels.value.trim(); keys.pixabay=kPixabay.value.trim();
+  keys.geminiKeys=parseKeys(kKeys.value);
+  keys.pexels=kPexels.value.trim(); keys.pixabay=kPixabay.value.trim();
   keys.model=kModel.value.trim();
   localStorage.setItem('cutlist.keys', JSON.stringify(keys));
-  updateKeyStatus();
+  syncKeyStats(); updateKeyStatus();
 }
-function updateKeyStatus(){ $('#keyBadge').classList.toggle('miss', !keys.gemini); }
+function updateKeyStatus(){
+  const n=keys.geminiKeys.length;
+  $('#keyBadge').classList.toggle('miss', !n);
+  $('#keyCount').textContent = n ? 'API KEYS · '+n : 'API KEYS';
+}
+
+/* per-key live status chips (panel me dikhte hain) */
+let keyStats=[];
+function syncKeyStats(){
+  keyStats=keys.geminiKeys.map((k,i)=>(keyStats[i]&&keyStats[i].key===k)?keyStats[i]:{key:k,status:'idle',msg:''});
+  renderKeysStatus();
+}
+function markKey(i,status,msg){
+  if(keyStats[i]){ keyStats[i].status=status; keyStats[i].msg=msg||''; renderKeysStatus(); }
+}
+function renderKeysStatus(){
+  const n=keys.geminiKeys.length;
+  const el=$('#keysStatus');
+  if(!n){ el.innerHTML='✗ KOI GEMINI KEY NAHI — upar paste karein (har line par ek)'; return; }
+  el.innerHTML=`✓ ${n} KEYS LOADED — ROTATION ACTIVE ` + keyStats.map((t,i)=>{
+    const mask=t.key.length>16 ? t.key.slice(0,7)+'…'+t.key.slice(-4) : t.key.slice(0,6)+'…';
+    const cls=t.status==='ok'?'ok':t.status==='fail'?'bad':'idle';
+    const dot=t.status==='ok'?' ✓':t.status==='fail'?' ✗':'';
+    return `<span class="chip ${cls}" title="${escAttr(t.msg||'idle')}">KEY ${i+1} · ${esc(mask)}${dot}</span>`;
+  }).join('');
+}
 
 /* ================= toast ================= */
 function toast(msg, kind='ok'){
@@ -424,7 +472,7 @@ function toast(msg, kind='ok'){
   setTimeout(()=>{ t.classList.add('out'); setTimeout(()=>t.remove(),320); }, 3600);
 }
 
-/* ================= processing overlay + production log ================= */
+/* ================= processing overlay + log ================= */
 const ov=$('#overlay'), logPanel=$('#logPanel'), ldNum=$('#ldNum');
 let cdTimer=null, t0=0, cd=3;
 function log(msg, cls=''){
@@ -483,19 +531,50 @@ SCRIPT:
 const cleanQuery = q => (Array.isArray(q)?q.join(' '):String(q||''))
   .replace(/["“”']/g,'').replace(/[^\w\s\-]/g,' ').replace(/\s+/g,' ').trim().toLowerCase()
   .split(' ').slice(0,6).join(' ');
-function fallbackQuery(script){ // agar AI query na de to script ke pehle 4 lamzi words
+function fallbackQuery(script){
   const stop=new Set(['the','a','an','and','he','she','it','of','in','on','at','to','is','are','was','his','her','with','as','they','then','finally','inside','into','over','past']);
   return (script||'').toLowerCase().replace(/[^\w\s]/g,' ').split(/\s+/).filter(w=>w&&!stop.has(w)).slice(0,4).join(' ');
 }
+const shortErr = e => String(e?.message||e).replace(/\s+/g,' ').slice(0,44);
 
-/* ---------- Gemini v2 — auto model resolution (deprecation-proof) ---------- */
+/* ---------- Gemini v3 — BULK KEYS + rotation ----------
+   Jitni keys lagai hain, request KEY #1 se shuru — fail (quota/rate-limit/busy/invalid)
+   to agli key, phir agli… sab fail to backoff ke sath poora round dobara (2 rounds). */
 const GLM_BASE='https://generativelanguage.googleapis.com/v1beta';
-let resolvedModel=null;
+const modelCache=new Map(); // keyIndex -> model name
 
-async function callGemini(model, prompt){
+function suggestedModel(raw){
+  const m=String(raw||'').match(/models\/([a-z0-9._\-]+)/i);
+  return m ? m[1] : null;
+}
+
+/* har key ka apna available-model resolution */
+async function resolveModelForKey(ki){
+  if(modelCache.has(ki)) return modelCache.get(ki);
+  const key=keys.geminiKeys[ki];
+  const pref=((keys.model||'').trim()||'gemini-3.6-flash').replace(/^models\//,'');
+  const prefs=[pref,'gemini-flash-latest','gemini-2.5-flash','gemini-2.0-flash'];
+  try{
+    const r=await fetch(`${GLM_BASE}/models?key=${encodeURIComponent(key)}&pageSize=100`);
+    if(r.ok){
+      const d=await r.json();
+      const avail=(d.models||[])
+        .filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent'))
+        .map(m=>String(m.name||'').replace(/^models\//,''));
+      for(const c of prefs){ if(avail.includes(c)){ modelCache.set(ki,c); return c; } }
+      const anyFlash=avail.filter(a=>a.includes('flash')).sort().pop();
+      if(anyFlash){ modelCache.set(ki,anyFlash); return anyFlash; }
+    }
+  }catch(_){}
+  modelCache.set(ki,pref);
+  return pref;
+}
+
+async function callGemini(ki, model, prompt){
+  const key=keys.geminiKeys[ki];
   let res;
   try{
-    res = await fetch(`${GLM_BASE}/models/${model}:generateContent?key=${encodeURIComponent(keys.gemini)}`,{
+    res = await fetch(`${GLM_BASE}/models/${model}:generateContent?key=${encodeURIComponent(key)}`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
@@ -503,59 +582,61 @@ async function callGemini(model, prompt){
         generationConfig:{ temperature:0.35, responseMimeType:'application/json' }
       })
     });
-  }catch(e){ throw new Error('Network error — internet connection check karein. ('+e.message+')'); }
+  }catch(e){ throw new Error('network fail — internet check karein'); }
   if(!res.ok){
-    let msg='Gemini request fail ('+res.status+')', raw='';
-    try{ const e=await res.json(); raw=e.error?.message||''; if(raw) msg+=' — '+raw; }catch(_){}
-    if(res.status===400||res.status===403) msg+=' — API key check karein';
-    if(res.status===429) msg+=' — rate limit, thori der baad koshish karein';
-    const err=new Error(msg); err.raw=raw; throw err;
+    let raw='';
+    try{ raw=(await res.json())?.error?.message||''; }catch(_){}
+    let msg =
+      res.status===401||res.status===403 ? 'key invalid/blocked' :
+      res.status===429 ? 'quota/rate-limit khatam' :
+      res.status===503 ? 'model busy (high demand)' :
+      'HTTP '+res.status;
+    const err=new Error(msg); err.raw=raw; err.status=res.status;
+    const sug=suggestedModel(raw);
+    if(sug && sug!==model){ modelCache.set(ki,sug); err.modelSwitched=sug; } // agli koshish isi key par naye model se
+    throw err;
   }
   return res.json();
 }
 
-/* error message me Google ka suggested model pakdein: "...use models/gemini-3.6-flash..." */
-function suggestedModel(raw){
-  const m=String(raw||'').match(/models\/([a-z0-9._\-]+)/i);
-  return m ? m[1] : null;
-}
-
-/* aapki key par jo flash model live available hai, wahi use ho */
-async function resolveModel(){
-  if(resolvedModel) return resolvedModel;
-  const pref=((keys.model||'').trim()||'gemini-3.6-flash').replace(/^models\//,'');
-  const prefs=[pref,'gemini-flash-latest','gemini-2.5-flash','gemini-2.0-flash'];
-  try{
-    const r=await fetch(`${GLM_BASE}/models?key=${encodeURIComponent(keys.gemini)}&pageSize=100`);
-    if(r.ok){
-      const d=await r.json();
-      const avail=(d.models||[])
-        .filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent'))
-        .map(m=>String(m.name||'').replace(/^models\//,''));
-      for(const c of prefs){ if(avail.includes(c)){ resolvedModel=c; return resolvedModel; } }
-      const anyFlash=avail.filter(a=>a.includes('flash')).sort().pop();
-      if(anyFlash){ resolvedModel=anyFlash; return resolvedModel; }
+let switches=0;
+async function geminiWithRetry(prompt){
+  const n=keys.geminiKeys.length;
+  if(!n) throw new Error('koi Gemini key set nahi hai');
+  const maxRounds = n>1 ? 2 : 3;
+  let lastErr=null;
+  for(let round=1; round<=maxRounds; round++){
+    if(round>1){
+      log(`Sab ${n} keys fail — round ${round}/${maxRounds}, ${2*round}s baad poori list dobara…`,'err');
+      await sleep(2000*round);
     }
-  }catch(_){}
-  resolvedModel=pref;
-  return resolvedModel;
+    for(let ki=0; ki<n; ki++){
+      try{
+        const model=await resolveModelForKey(ki);
+        log(`KEY #${ki+1} → ${model} par request…`);
+        const data=await callGemini(ki, model, prompt);
+        markKey(ki,'ok','breakdown ok — KEY #'+(ki+1)+' ne kaam kiya');
+        return data;
+      }catch(e){
+        lastErr=e;
+        if(e.modelSwitched && switches<4){
+          switches++;
+          markKey(ki,'idle','model switch: '+e.modelSwitched);
+          log(`KEY #${ki+1} → deprecation — ${e.modelSwitched} par switch, same key se dobara…`,'err');
+          ki--; continue; // usi key par naye model se retry
+        }
+        markKey(ki,'fail',shortErr(e));
+        log(`KEY #${ki+1} FAIL — ${shortErr(e)} → KEY #${((ki+1)%n)+1} par ja rahe hain…`,'err');
+      }
+    }
+  }
+  throw lastErr || new Error('Gemini fail — sab keys try ho gayin');
 }
 
 async function geminiBreakdown(script){
   const prompt=buildPrompt(script);
-  let model=await resolveModel();
-  log('MODEL: '+model);
-  let data;
-  try{
-    data=await callGemini(model,prompt);
-  }catch(e){
-    const sug=suggestedModel(e.raw);   // Google ne replacement model error me bataya ho to khud switch
-    if(sug && sug!==model){
-      log(`${model} unavailable — ${sug} par switch ho gaya`,'err');
-      resolvedModel=sug; model=sug;
-      data=await callGemini(model,prompt);
-    } else { throw e; }
-  }
+  log(`${keys.geminiKeys.length} Gemini keys loaded — rotation ON (fail → agli key)`);
+  const data=await geminiWithRetry(prompt);
   let txt=(data?.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();
   txt=txt.replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
   let parsed;
@@ -567,14 +648,37 @@ async function geminiBreakdown(script){
     script: String(s.script||'').trim(),
     keywords: cleanQuery(s.keywords) || fallbackQuery(s.script),
     visual: String(s.visual||'').trim(),
-    status:'done', clips:[], errors:[]
+    status:'done', clips:[], errors:[], statusLog:[]
   }));
 }
 
-/* ================= clip sources ================= */
+/* ================= clip sources — 4 APIs ka fallback chain ================= */
+async function jfetch(url, opts={}, ms=9000){
+  const c=new AbortController();
+  const t=setTimeout(()=>c.abort(), ms);
+  try{
+    const r=await fetch(url, {...opts, signal:c.signal});
+    clearTimeout(t);
+    return r;
+  }catch(e){
+    clearTimeout(t);
+    const err=new Error(e.name==='AbortError' ? 'timeout (response nahi mila)' : 'network fail');
+    err.transient=true;
+    throw err;
+  }
+}
+function httpErr(status){
+  const e=new Error(
+    status===429 ? 'rate limit' :
+    status===401||status===403 ? 'key ghalat hai' : 'HTTP '+status);
+  e.transient=(status===429||status>=500);
+  return e;
+}
+const parseLen = l => !l ? 0 : (String(l).includes(':') ? String(l).split(':').reduce((a,b)=>a*60+(+b||0),0) : Math.round(+l)||0);
+
 async function searchPexels(q,key){
-  const r=await fetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(q)}&per_page=4&orientation=landscape`,{headers:{Authorization:key}});
-  if(!r.ok) throw new Error(r.status===429?'rate limit':'HTTP '+r.status);
+  const r=await jfetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(q)}&per_page=4&orientation=landscape`,{headers:{Authorization:key}});
+  if(!r.ok) throw httpErr(r.status);
   const d=await r.json();
   return (d.videos||[]).map(v=>{
     const files=(v.video_files||[]).filter(f=>f.file_type==='video/mp4'&&f.width);
@@ -587,8 +691,8 @@ async function searchPexels(q,key){
   });
 }
 async function searchPixabay(q,key){
-  const r=await fetch(`https://pixabay.com/api/videos/?key=${encodeURIComponent(key)}&q=${encodeURIComponent(q)}&per_page=4&safesearch=true`);
-  if(!r.ok) throw new Error(r.status===401?'key ghalat hai':'HTTP '+r.status);
+  const r=await jfetch(`https://pixabay.com/api/videos/?key=${encodeURIComponent(key)}&q=${encodeURIComponent(q)}&per_page=4&safesearch=true`);
+  if(!r.ok) throw httpErr(r.status);
   const d=await r.json();
   return (d.hits||[]).map(h=>{
     const V=h.videos||{};
@@ -601,17 +705,83 @@ async function searchPixabay(q,key){
       res:size.width?`${size.width}×${size.height}`:'' };
   });
 }
-async function searchScene(scene){ // dono sources parallel — koi fail ho to scene survive kare
-  scene.errors=[]; scene.clips=[];
-  const jobs=[];
-  jobs.push(keys.pexels
-    ? searchPexels(scene.keywords,keys.pexels).then(r=>scene.clips.push(...r)).catch(e=>scene.errors.push('Pexels: '+e.message))
-    : Promise.resolve());
-  jobs.push(keys.pixabay
-    ? searchPixabay(scene.keywords,keys.pixabay).then(r=>scene.clips.push(...r)).catch(e=>scene.errors.push('Pixabay: '+e.message))
-    : Promise.resolve());
-  await Promise.all(jobs);
-  if(!keys.pexels&&!keys.pixabay) scene.errors.push('Pexels/Pixabay keys set nahi hain — neeche direct search links hain');
+async function searchWikimedia(q){
+  const u='https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*'
+    +'&generator=search&gsrsearch='+encodeURIComponent('filetype:video '+q)
+    +'&gsrnamespace=6&gsrlimit=6&prop=imageinfo&iiprop=url|size|mime&iiurlwidth=560';
+  const r=await jfetch(u);
+  if(!r.ok) throw httpErr(r.status);
+  const d=await r.json();
+  const pages=Object.values(d?.query?.pages||{});
+  return pages.map(p=>{
+    const ii=(p.imageinfo||[])[0];
+    if(!ii) return null;
+    if(ii.mime && !/webm|mp4|ogg|video/i.test(ii.mime)) return null;
+    return { id:'wm'+p.pageid, source:'WIKIMEDIA',
+      page:'https://commons.wikimedia.org/wiki/'+encodeURI(p.title.replace(/ /g,'_')),
+      thumb:ii.thumburl||'', preview:ii.url, download:ii.url,
+      duration:ii.duration||0, res:ii.width?`${ii.width}×${ii.height}`:'' };
+  }).filter(Boolean);
+}
+async function searchArchive(q){
+  const u='https://archive.org/advancedsearch.php?q='+encodeURIComponent(q+' AND mediatype:(movies)')
+    +'&fl%5B%5D=identifier&fl%5B%5D=title&rows=3&page=1&output=json';
+  const r=await jfetch(u);
+  if(!r.ok) throw httpErr(r.status);
+  const d=await r.json();
+  const docs=(d?.response?.docs||[]);
+  const metas=await Promise.all(docs.map(async doc=>{
+    try{
+      const m=await (await jfetch(`https://archive.org/metadata/${doc.identifier}`,{},7000)).json();
+      const files=(m?.files||[]).filter(f=>/\.mp4$/i.test(f.name||''));
+      const f=files.find(x=>{const L=parseLen(x.length); return L>0&&L<=600;})||files[0];
+      if(!f) return null;
+      return { id:'ia'+doc.identifier, source:'ARCHIVE',
+        page:'https://archive.org/details/'+doc.identifier,
+        thumb:'https://archive.org/services/img/'+doc.identifier,
+        preview:'https://archive.org/download/'+doc.identifier+'/'+encodeURIComponent(f.name),
+        download:'https://archive.org/download/'+doc.identifier+'/'+encodeURIComponent(f.name),
+        duration:parseLen(f.length), res:f.width?`${f.width}×${f.height}`:'' };
+    }catch(_){ return null; }
+  }));
+  return metas.filter(Boolean);
+}
+
+const SOURCES=[
+  { name:'PEXELS',   needsKey:'pexels',  fn:searchPexels },
+  { name:'PIXABAY',  needsKey:'pixabay', fn:searchPixabay },
+  { name:'WIKIMEDIA',needsKey:null,      fn:searchWikimedia },
+  { name:'ARCHIVE',  needsKey:null,      fn:searchArchive },
+];
+const enabledSources=()=>SOURCES.filter(s=>!s.needsKey||keys[s.needsKey]);
+
+async function trySource(src,q){
+  for(let attempt=1;attempt<=2;attempt++){
+    try{
+      const clips=await src.fn(q, src.needsKey?keys[src.needsKey]:undefined);
+      return { ok:true, clips:clips||[], err:null };
+    }catch(e){
+      const transient = e.transient || /timeout|network/i.test(e.message||'');
+      if(attempt===1&&transient){ await sleep(1400); continue; }
+      return { ok:false, clips:[], err:e.message||'fail' };
+    }
+  }
+}
+async function searchScene(scene){
+  scene.errors=[]; scene.clips=[]; scene.statusLog=[];
+  const chain=enabledSources();
+  for(const src of chain){
+    const r=await trySource(src, scene.keywords);
+    if(r.ok&&r.clips.length){
+      scene.clips.push(...r.clips);
+      scene.statusLog.push({name:src.name, ok:true, msg:r.clips.length+' clips'});
+    }else if(r.ok){
+      scene.statusLog.push({name:src.name, ok:false, msg:'0 results'});
+    }else{
+      scene.statusLog.push({name:src.name, ok:false, msg:r.err});
+      scene.errors.push(src.name+': '+r.err);
+    }
+  }
 }
 const srcLinks = q => `
   <a target="_blank" rel="noopener" href="https://www.pexels.com/search/videos/${encodeURIComponent(q)}/">PEXELS ↗</a>
@@ -640,7 +810,8 @@ function frameEl(s,c,idx){
 }
 function sceneEl(s,idx){
   const pickedId=selections.get(s.sceneNumber);
-  const nP=s.clips.filter(c=>c.source==='PEXELS').length, nB=s.clips.filter(c=>c.source==='PIXABAY').length;
+  const chips=(s.statusLog||[]).map(t=>
+    `<span class="chip ${t.ok?'ok':'bad'}">${t.name} ${t.ok?'✓':'✗'} ${esc(t.msg)}</span>`).join('');
   const art=document.createElement('article');
   art.className='scene'; art.dataset.idx=idx;
   art.innerHTML=`
@@ -662,16 +833,16 @@ function sceneEl(s,idx){
       <div class="stripwrap">
         <div class="fs-prock top"></div>
         ${s.status==='loading'
-          ?`<div class="strip loading"><span class="ldots">SEARCHING PEXELS / PIXABAY<span class="d">.</span><span class="d">.</span><span class="d">.</span></span></div>`
+          ?`<div class="strip loading"><span class="ldots">4 SOURCES SEARCH HO RAHI HAIN<span class="d">.</span><span class="d">.</span><span class="d">.</span></span></div>`
           : s.clips.length
             ?`<div class="strip">${s.clips.map((c,i)=>frameEl(s,c,i)).join('')}</div>`
-            :`<div class="strip empty"><p>${esc(s.errors.join(' — ')||'Is query ke liye koi clip nahi mili — query edit kar ke retry karein.')}</p><div class="nlinks">${srcLinks(s.keywords)}</div></div>`}
+            :`<div class="strip empty"><p>${esc(s.errors.join(' — ')||'Kisi bhi source par is query ke liye clip nahi mili — query edit kar ke retry karein.')}</p><div class="nlinks">${srcLinks(s.keywords)}</div></div>`}
         <div class="fs-prock bot"></div>
       </div>
       <div class="srcrow">
-        <span>PEXELS <b>${nP}</b> · PIXABAY <b>${nB}</b></span>
+        <div class="chips">${chips}</div>
         <a class="srclink" target="_blank" rel="noopener" href="https://www.pinterest.com/search/videos/?q=${encodeURIComponent(s.keywords)}">PINTEREST ${I('external',11)}</a>
-        ${s.errors.length?`<button class="retry" data-act="refresh">${I('refresh',11)} RETRY</button>`:''}
+        ${(s.errors||[]).length?`<button class="retry" data-act="refresh">${I('refresh',11)} RETRY</button>`:''}
       </div>
     </div>`;
   return art;
@@ -691,11 +862,11 @@ function updateCounts(){
   document.body.classList.toggle('tray-on',on);
 }
 
-/* ================= interactions (event delegation) ================= */
+/* ================= interactions ================= */
 list.addEventListener('click', async e=>{
   const act=e.target.closest('[data-act]');
   const sc=e.target.closest('.scene');
-  if(sc){ // thumbnail par tap/click = preview toggle (touch ke liye bhi)
+  if(sc){
     const ph=e.target.closest('.ph');
     if(!act&&ph){
       const v=ph._vid;
@@ -729,7 +900,6 @@ list.addEventListener('keydown', e=>{
     reSearch(+sc.dataset.idx, e.target.value);
   }
 });
-/* hover par clip ka muted preview play ho */
 list.addEventListener('mouseover', e=>{ const ph=e.target.closest('.ph'); if(ph) startPreview(ph); });
 list.addEventListener('mouseout', e=>{ const ph=e.target.closest('.ph'); if(ph&&!ph.contains(e.relatedTarget)) stopPreview(ph); });
 function startPreview(ph){
@@ -756,10 +926,10 @@ async function reSearch(idx,q){
   s.status='done';
   list.children[idx].replaceWith(sceneEl(s,idx));
   updateCounts();
-  toast(`SC.${pad(s.sceneNumber)} — ${s.clips.length} clips mile${s.errors.length?' (kuch errors hain)':''}`, s.errors.length?'warn':'ok');
+  toast(`SC.${pad(s.sceneNumber)} — ${s.clips.length} clips mile`, s.clips.length?'ok':'warn');
 }
 
-/* ================= download (blob try, warna new tab fallback) ================= */
+/* ================= download ================= */
 async function downloadClip(clip,s){
   toast('Download shuru ho gaya…');
   try{
@@ -774,7 +944,7 @@ async function downloadClip(clip,s){
     toast('Clip download ho gayi');
   }catch(_){
     window.open(clip.download,'_blank','noopener');
-    toast('Browser ne direct download block kiya — video naye tab me khul gayi, wahan se save kar lein','warn');
+    toast('Browser ne direct download block kiya — video naye tab me khul gayi','warn');
   }
 }
 
@@ -826,12 +996,13 @@ async function runPipeline(){
   if(busy) return;
   const script=scriptEl.value.trim();
   if(wordCount(script)<8){ toast('Script bohat chhoti hai — thora tafseel ke sath paste karein','warn'); scriptEl.focus(); return; }
-  if(!keys.gemini){
-    $('#keyPanel').classList.remove('hidden'); kGemini.focus();
-    toast('Pehle apni Gemini API key add karein (API KEYS)','warn');
+  if(!keys.geminiKeys.length){
+    $('#keyPanel').classList.remove('hidden'); kKeys.focus();
+    toast('Pehle apni Gemini key(s) paste karein — har line par ek (API KEYS)','warn');
     return;
   }
   busy=true; btnGo.disabled=true; btnGo.firstChild.textContent='ROLLING… ';
+  switches=0;
   startOverlay(); setStep(2);
   try{
     log(`SCRIPT RECEIVED — ${wordCount(script)} words`);
@@ -839,12 +1010,14 @@ async function runPipeline(){
     state.scenes=await geminiBreakdown(script);
     log(`${state.scenes.length} scenes identify ho gaye`,'ok');
     setStep(3);
-    log('Clip sources search ho rahi hain (Pexels / Pixabay)…');
-    for(let i=0;i<state.scenes.length;i+=3){ // rate limits ke liye batches of 3
+    const nSrc=enabledSources().length;
+    log(`Clip chain: ${nSrc} sources (PEXELS → PIXABAY → WIKIMEDIA → ARCHIVE)…`);
+    for(let i=0;i<state.scenes.length;i+=3){
       const batch=state.scenes.slice(i,i+3);
       await Promise.all(batch.map(async s=>{
         await searchScene(s);
-        log(`SC.${pad(s.sceneNumber)} → "${s.keywords}" → ${s.clips.length} clips${s.errors.length?' (kuch errors)':''}`, s.errors.length?'err':'ok');
+        const okN=s.statusLog.filter(t=>t.ok).length;
+        log(`SC.${pad(s.sceneNumber)} → "${s.keywords}" → ${s.clips.length} clips (${okN}/${s.statusLog.length} sources ok)`, s.clips.length?'ok':'err');
       }));
     }
     selections.clear();
@@ -866,11 +1039,11 @@ async function runPipeline(){
 }
 
 /* ================= bindings ================= */
-[kGemini,kPexels,kPixabay].forEach(el=>{
+[kKeys,kModel].forEach(el=>el.addEventListener('input',saveKeys));
+[kPexels,kPixabay].forEach(el=>{
   el.addEventListener('input',saveKeys);
   el.addEventListener('dblclick',()=>{ el.type=el.type==='password'?'text':'password'; });
 });
-kModel.addEventListener('input',saveKeys);
  $('#keyBtn').addEventListener('click',()=>$('#keyPanel').classList.toggle('hidden'));
  $('#btnSample').addEventListener('click',()=>{
   scriptEl.value=SAMPLE; scriptEl.dispatchEvent(new Event('input'));
