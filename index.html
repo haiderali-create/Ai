@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
 <style>
 /* ============ CUTLIST — shooting-script aesthetic ============ */
 :root{
@@ -54,10 +55,21 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
 .btn:hover{background:var(--red);border-color:var(--red);transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
 .btn.ghost{background:transparent;color:var(--ink)}
 .btn.ghost:hover{border-color:var(--red);color:var(--red);box-shadow:3px 3px 0 rgba(25,23,19,.25)}
+.btn.solid-red{background:var(--red);border-color:var(--red);color:var(--paper)}
+.btn.solid-red:hover{background:var(--ink);border-color:var(--ink)}
 .btn.big{padding:17px 26px;font-size:13px}
 .btn.sm{padding:10px 14px;font-size:10.5px}
-.btn:disabled{opacity:.45;cursor:wait;transform:none;box-shadow:none}
+.btn:disabled{opacity:.55;cursor:progress;transform:none;box-shadow:none}
 .btn .ic{display:inline-flex}
+
+/* ============ Mode tabs ============ */
+.modetabs{display:flex;gap:0;margin:34px 0 0;border:1px solid var(--ink);width:max-content;max-width:100%}
+.mtab{font:700 11px var(--ui);letter-spacing:.18em;padding:13px 22px;background:var(--paper-2);color:var(--ink);
+  border:0;cursor:pointer;transition:.15s;display:inline-flex;align-items:center;gap:9px}
+.mtab+.mtab{border-left:1px solid var(--ink)}
+.mtab.on{background:var(--ink);color:var(--paper)}
+.mtab:not(.on):hover{color:var(--red)}
+.mtab .no{font:700 11px var(--mono);opacity:.6}
 
 /* ============ API keys panel ============ */
 .keypanel{border:1px solid var(--ink);background:var(--paper-2);box-shadow:6px 6px 0 rgba(25,23,19,.1);
@@ -75,7 +87,7 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
   font:700 11px var(--mono);letter-spacing:.04em;color:var(--ink-2)}
 
 /* ============ Workflow steps ============ */
-.steps{display:flex;align-items:center;gap:14px;margin:30px 0 34px;flex-wrap:wrap}
+.steps{display:flex;align-items:center;gap:14px;margin:26px 0 30px;flex-wrap:wrap}
 .step{display:flex;align-items:center;gap:9px;font:600 10.5px var(--ui);letter-spacing:.16em;color:var(--ink-2)}
 .step .no{font:700 12px var(--mono);border:1px solid currentColor;width:25px;height:25px;display:grid;place-items:center;flex:none}
 .step.on{color:var(--red)}
@@ -103,6 +115,19 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
 .sample-link:hover{color:var(--red);border-color:var(--red)}
 .hint{font:12px/1.6 var(--ui);color:var(--ink-2);max-width:56ch}
 .hint b{color:var(--ink)}
+
+/* ============ Topic pane ============ */
+.topicbody{padding:30px;display:flex;flex-direction:column;gap:18px}
+.tlabel2{font:600 10px var(--ui);letter-spacing:.2em;color:var(--ink-2)}
+#topicInput{font:700 clamp(17px,2.6vw,23px)/1.4 var(--mono);background:transparent;border:0;border-bottom:2px solid var(--ink);
+  outline:0;color:var(--ink);caret-color:var(--red);padding:8px 2px 12px;width:100%}
+#topicInput:focus{border-bottom-color:var(--red)}
+#topicInput::placeholder{color:rgba(110,103,91,.55);font-weight:400}
+.qchips{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.qlbl{font:700 9.5px var(--ui);letter-spacing:.22em;color:var(--ink-2)}
+.qchip{font:700 11px var(--mono);letter-spacing:.04em;border:1px dashed rgba(25,23,19,.5);background:transparent;
+  color:var(--ink);padding:7px 11px;cursor:pointer;transition:.15s}
+.qchip:hover{border-style:solid;border-color:var(--red);color:var(--red);background:rgba(198,58,33,.06)}
 
 /* ============ Results header ============ */
 .rhead{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;
@@ -232,6 +257,9 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
   font:600 10.5px var(--ui);letter-spacing:.16em;padding:10px 14px;cursor:pointer;
   display:inline-flex;gap:8px;align-items:center;transition:.15s}
 .tbtn:hover{border-color:var(--red);background:var(--red)}
+.tbtn.hot{background:var(--red);border-color:var(--red)}
+.tbtn.hot:hover{background:#A02D18}
+.tbtn:disabled{opacity:.55;cursor:progress}
 
 /* ============ Toasts ============ */
 #toasts{position:fixed;right:20px;bottom:84px;z-index:120;display:flex;flex-direction:column;gap:10px;max-width:min(380px,90vw)}
@@ -254,6 +282,9 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
   .frame{width:210px}
   .actionbar{flex-direction:column;align-items:stretch}
   .actionbar .btn{justify-content:center}
+  .racts{width:100%}
+  .modetabs{width:100%}
+  .mtab{flex:1;justify-content:center}
 }
 </style>
 </head>
@@ -270,7 +301,7 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
     </svg>
     <div>
       <h1>CUTLIST<i>.</i></h1>
-      <p>SCRIPT → B-ROLL BREAKDOWN</p>
+      <p>SCRIPT / TOPIC → B-ROLL BREAKDOWN</p>
     </div>
   </div>
   <div class="mright">
@@ -292,21 +323,20 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
     </div>
     <div class="keys-status" id="keysStatus"></div>
     <p class="kp-note">
-      <b>Gemini key rotation:</b> jitni keys lagai hain, har breakdown request ke liye pehli key se shuru hota hai —
-      agar key fail ho (quota khatam / rate limit / busy / invalid) to <b>khud agli key</b> par jump, phir agli… jab tak kaam na ban jaye.
-      Sab keys fail ho jayen to thori der baad poori list dobara try hoti hai (2 rounds). Keys sirf aapke browser ke localStorage me rehti hain.
+      <b>Gemini key rotation:</b> request pehli key se shuru — key fail ho (quota / rate limit / busy / invalid) to
+      <b>khud agli key</b> par jump… sab fail to poori list dobara (2 rounds). Keys sirf aapke browser me rehti hain.
       Gemini key <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio</a> se,
-      Pexels key <a href="https://www.pexels.com/api/" target="_blank" rel="noopener">pexels.com/api</a> se,
-      Pixabay key <a href="https://pixabay.com/api/docs/" target="_blank" rel="noopener">pixabay.com/api/docs</a> se free milti hai.
-      <b>Clip sources ka chain:</b> PEXELS → PIXABAY → WIKIMEDIA COMMONS (keyless) → INTERNET ARCHIVE (keyless) — jo API fail ho, agli.
-      Pinterest ki public API nahi hoti — direct search link milta hai. Model field khaali chhoren — har key par available latest flash model khud pakra jata hai.
+      Pexels <a href="https://www.pexels.com/api/" target="_blank" rel="noopener">pexels.com/api</a> se,
+      Pixabay <a href="https://pixabay.com/api/docs/" target="_blank" rel="noopener">pixabay.com/api/docs</a> se free.
+      <b>Clip chain:</b> PEXELS → PIXABAY → WIKIMEDIA (keyless) → ARCHIVE (keyless) — jo fail, agli.
+      <b>TOPIC MODE:</b> sirf topic likhein (jaise "real animal rescue") — AI 10 visual angles banata hai aur har angle par clips dhoondhta hai.
     </p>
   </div>
 </section>
 
 <!-- Workflow steps -->
 <nav class="wrap steps" aria-label="Workflow">
-  <div class="step on" id="st1"><span class="no">01</span>SCRIPT</div><span class="srule"></span>
+  <div class="step on" id="st1"><span class="no">01</span><span id="st1lbl">SCRIPT</span></div><span class="srule"></span>
   <div class="step" id="st2"><span class="no">02</span>AI ANALYSIS</div><span class="srule"></span>
   <div class="step" id="st3"><span class="no">03</span>CLIP SOURCING</div><span class="srule"></span>
   <div class="step" id="st4"><span class="no">04</span>PICK &amp; EXPORT</div>
@@ -314,21 +344,58 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
 
 <main class="wrap">
 
-  <!-- STAGE 1: script input -->
+  <!-- STAGE 1: input -->
   <section id="stageInput">
-    <div class="sheet">
-      <div class="sheethead"><span>VIDEO SCRIPT</span><span class="pg">PG. 01 · REV. A</span></div>
-      <div class="margin-line"></div>
-      <textarea id="scriptInput" spellcheck="false" placeholder="Apni complete video script yahan paste karein — English ya koi bhi zubaan.&#10;&#10;AI har scene, sentence aur visual keyword khud identify karega, phir Pexels / Pixabay / Wikimedia / Archive se matching clips dhoondh dega."></textarea>
+
+    <!-- mode tabs -->
+    <div class="modetabs" role="tablist">
+      <button class="mtab on" data-mode="script" role="tab"><span class="no">A</span>SCRIPT → SCENES</button>
+      <button class="mtab" data-mode="topic" role="tab"><span class="no">B</span>TOPIC → CLIPS</button>
     </div>
-    <div class="wcount" id="wcount"><b>0</b> WORDS · <b>0</b> LINES · AUTOSAVED</div>
-    <div class="actionbar">
-      <div class="alinks">
-        <button class="sample-link" id="btnSample">SAMPLE SCRIPT LOAD KAREIN</button>
-        <p class="hint"><b>Gemini keys bulk mein</b> lagayen (API KEYS → har line par ek) — jo key fail ho, tool khud agli par chala jayega. Pexels/Pixabay optional; Wikimedia + Archive bina key hamesha on. Har scene par chaaron clip APIs try hoti hain.</p>
+
+    <!-- PANE A: script -->
+    <div id="paneScript">
+      <div class="sheet">
+        <div class="sheethead"><span>VIDEO SCRIPT</span><span class="pg">PG. 01 · REV. A</span></div>
+        <div class="margin-line"></div>
+        <textarea id="scriptInput" spellcheck="false" placeholder="Apni complete video script yahan paste karein — English ya koi bhi zubaan.&#10;&#10;AI har scene, sentence aur visual keyword khud identify karega, phir Pexels / Pixabay / Wikimedia / Archive se matching clips dhoondh dega."></textarea>
       </div>
-      <button class="btn big" id="btnGo">BREAK DOWN SCRIPT <span class="ic" data-icon="arrow"></span></button>
+      <div class="wcount" id="wcount"><b>0</b> WORDS · <b>0</b> LINES · AUTOSAVED</div>
+      <div class="actionbar">
+        <div class="alinks">
+          <button class="sample-link" id="btnSample">SAMPLE SCRIPT LOAD KAREIN</button>
+          <p class="hint"><b>Gemini keys bulk mein</b> lagayen (API KEYS → har line par ek) — jo key fail ho, tool khud agli par chala jayega. Breakdown ke baad <b>ek click ZIP download</b>.</p>
+        </div>
+        <button class="btn big" id="btnGo">BREAK DOWN SCRIPT <span class="ic" data-icon="arrow"></span></button>
+      </div>
     </div>
+
+    <!-- PANE B: topic -->
+    <div id="paneTopic" class="hidden">
+      <div class="sheet">
+        <div class="sheethead"><span>TOPIC / NICHE</span><span class="pg">ANGLE RESEARCH</span></div>
+        <div class="topicbody">
+          <span class="tlabel2">JIS TOPIC KE VIDEOS CHAHIVEN, WO LIKHEIN</span>
+          <input id="topicInput" spellcheck="false" autocomplete="off" placeholder="misal:  real animal rescue">
+          <div class="qchips">
+            <span class="qlbl">QUICK&nbsp;TOPICS:</span>
+            <button class="qchip" data-topic="real animal rescue">REAL ANIMAL RESCUE</button>
+            <button class="qchip" data-topic="animal shelter volunteer dogs">ANIMAL SHELTER</button>
+            <button class="qchip" data-topic="street food cooking night market">STREET FOOD</button>
+            <button class="qchip" data-topic="heavy rain flooded street storm">RAIN / STORM</button>
+            <button class="qchip" data-topic="farmer working field tractor village">FARM / VILLAGE</button>
+          </div>
+          <p class="hint"><b>Kaise chalta hai:</b> AI aapke topic ke <b>10 alag visual angles</b> sochta hai (main action, close-up, location, log, equipment, aftermath…) — har angle ki English search query banata hai, phir chaaron clip APIs se us angle ke clips nikal kar ek breakdown sheet bana deta hai.</p>
+        </div>
+      </div>
+      <div class="actionbar">
+        <div class="alinks">
+          <p class="hint">Topic jitna waazeh ho, clips utni relevant — "real" ya "documentary" likhne se AI real-life footage wali queries banata hai.</p>
+        </div>
+        <button class="btn big" id="btnGoTopic">FIND CLIPS <span class="ic" data-icon="arrow"></span></button>
+      </div>
+    </div>
+
   </section>
 
   <!-- STAGE 2: results -->
@@ -339,9 +406,11 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
         <p class="rmeta" id="rmeta">—</p>
       </div>
       <div class="racts">
+        <button class="btn solid-red" id="btnZipAll" title="Jo clips mili hain SAB — ek zip file me"><span class="ic" data-icon="download"></span><span class="lbl">ZIP — ALL CLIPS</span></button>
+        <button class="btn ghost" id="btnZipPicks" title="Selected clips (ya recommended) — ek zip me"><span class="ic" data-icon="download"></span><span class="lbl">ZIP — PICKS</span></button>
         <button class="btn ghost" id="btnCopy"><span class="ic" data-icon="clipboard"></span>COPY LIST</button>
         <button class="btn ghost" id="btnExport"><span class="ic" data-icon="file"></span>EXPORT .JSON</button>
-        <a class="btn ghost" href="#stageInput" id="btnNew">NEW SCRIPT</a>
+        <a class="btn ghost" href="#stageInput" id="btnNew">NEW</a>
       </div>
     </div>
     <div id="sceneList"></div>
@@ -373,6 +442,7 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
   <span class="tlabel">BIN</span>
   <span class="tcount" id="trayCount"><b>00</b> CLIPS PICKED</span>
   <span class="tsep"></span>
+  <button class="tbtn hot" id="trayZip" title="Selected clips (ya recommended) — ek ZIP me download"><span class="ic" data-icon="download"></span><span class="lbl">ZIP PICKS</span></button>
   <button class="tbtn" id="trayCopy"><span class="ic" data-icon="clipboard"></span>COPY LIST</button>
   <button class="tbtn" id="trayExport"><span class="ic" data-icon="file"></span>EXPORT .JSON</button>
   <button class="tbtn" id="trayClear"><span class="ic" data-icon="trash"></span>CLEAR</button>
@@ -411,19 +481,19 @@ document.querySelectorAll('[data-icon]').forEach(el => el.innerHTML = I(el.datas
 const state = { scenes: [] };
 const selections = new Map();
 const keys = { geminiKeys:[], pexels:'', pixabay:'', model:'' };
+let mode='script';
 
 const kKeys=$('#kKeys'), kPexels=$('#kPexels'), kPixabay=$('#kPixabay'), kModel=$('#kModel');
+const scriptEl=$('#scriptInput'), topicEl=$('#topicInput');
 
-/* bulk keys parse — newline, comma ya space se bhi alag ho jayen */
 function parseKeys(txt){
   return [...new Set(String(txt||'').split(/[\s,;]+/).map(s=>s.trim()).filter(s=>s.length>10))];
 }
-
 function loadKeys(){
   try{
     const s=JSON.parse(localStorage.getItem('cutlist.keys')||'{}');
     keys.pexels=s.pexels||''; keys.pixabay=s.pixabay||''; keys.model=s.model||'';
-    keys.geminiKeys=Array.isArray(s.geminiKeys)?s.geminiKeys:(s.gemini?[s.gemini]:[]); // purani single-key migrate
+    keys.geminiKeys=Array.isArray(s.geminiKeys)?s.geminiKeys:(s.gemini?[s.gemini]:[]);
   }catch(_){}
   kKeys.value=(keys.geminiKeys||[]).join('\n');
   kPexels.value=keys.pexels||''; kPixabay.value=keys.pixabay||''; kModel.value=keys.model||'';
@@ -442,7 +512,6 @@ function updateKeyStatus(){
   $('#keyCount').textContent = n ? 'API KEYS · '+n : 'API KEYS';
 }
 
-/* per-key live status chips (panel me dikhte hain) */
 let keyStats=[];
 function syncKeyStats(){
   keyStats=keys.geminiKeys.map((k,i)=>(keyStats[i]&&keyStats[i].key===k)?keyStats[i]:{key:k,status:'idle',msg:''});
@@ -463,13 +532,23 @@ function renderKeysStatus(){
   }).join('');
 }
 
+/* ================= mode switching ================= */
+function setMode(m){
+  mode=m;
+  document.querySelectorAll('.mtab').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));
+  $('#paneScript').classList.toggle('hidden',m!=='script');
+  $('#paneTopic').classList.toggle('hidden',m!=='topic');
+  $('#st1lbl').textContent = m==='topic' ? 'TOPIC' : 'SCRIPT';
+}
+document.querySelectorAll('.mtab').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+
 /* ================= toast ================= */
 function toast(msg, kind='ok'){
   const t=document.createElement('div');
   t.className='toast'+(kind==='warn'?' warn':'');
   t.textContent=msg;
   $('#toasts').appendChild(t);
-  setTimeout(()=>{ t.classList.add('out'); setTimeout(()=>t.remove(),320); }, 3600);
+  setTimeout(()=>{ t.classList.add('out'); setTimeout(()=>t.remove(),320); }, 4200);
 }
 
 /* ================= processing overlay + log ================= */
@@ -510,7 +589,7 @@ He runs along the waterfront at sunrise, his breath visible in the cold air.
 Montage: hands sketching ideas, a printer spitting out pages, notes pinned to a wall.
 Finally, he closes the laptop, steps outside into the sunlight, and smiles for the first time.`;
 
-/* ================= AI: Gemini breakdown ================= */
+/* ================= AI prompts ================= */
 function buildPrompt(script){
   return `You are a senior video editor preparing a shot list. Analyze the script below and split it into scenes for sourcing stock B-roll footage.
 
@@ -528,27 +607,41 @@ SCRIPT:
  ${script}
 """`;
 }
+function buildTopicPrompt(topic){
+  return `You are a stock-footage researcher. I will give you a TOPIC. Produce a set of diverse, VISUALLY CONCRETE search queries for finding real video footage about this topic.
+
+RULES:
+- Exactly 10 queries (sceneNumber 1-10).
+- Each "keywords": short English search query, 2-5 words, concrete visual subject (animals, people, objects, actions, places). If the topic includes words like "real" or "documentary", keep that real-life phrasing — prefer raw/documentary style queries over cinematic fiction.
+- Cover DIFFERENT angles across the set: main action, close-up detail, wide location shot, the people involved, equipment/tools being used, emotional moment, result/aftermath, environment/habitat.
+- Each "visual": one short English sentence describing that shot.
+- No abstract words like "hope", "feeling", "success".
+
+Respond with JSON only, exactly this shape:
+{"scenes":[{"sceneNumber":1,"keywords":"rescuers pulling dog from flood water","visual":"Rescue workers wading through floodwater carrying a dog to safety"}]}
+
+TOPIC:
+"""
+ ${topic}
+"""`;
+}
 const cleanQuery = q => (Array.isArray(q)?q.join(' '):String(q||''))
   .replace(/["“”']/g,'').replace(/[^\w\s\-]/g,' ').replace(/\s+/g,' ').trim().toLowerCase()
   .split(' ').slice(0,6).join(' ');
-function fallbackQuery(script){
-  const stop=new Set(['the','a','an','and','he','she','it','of','in','on','at','to','is','are','was','his','her','with','as','they','then','finally','inside','into','over','past']);
-  return (script||'').toLowerCase().replace(/[^\w\s]/g,' ').split(/\s+/).filter(w=>w&&!stop.has(w)).slice(0,4).join(' ');
+function fallbackQuery(seed){
+  const stop=new Set(['the','a','an','and','he','she','it','of','in','on','at','to','is','are','was','his','her','with','as','they','then','finally','inside','into','over','past','real']);
+  return String(seed||'').toLowerCase().replace(/[^\w\s]/g,' ').split(/\s+/).filter(w=>w&&!stop.has(w)).slice(0,4).join(' ');
 }
 const shortErr = e => String(e?.message||e).replace(/\s+/g,' ').slice(0,44);
 
-/* ---------- Gemini v3 — BULK KEYS + rotation ----------
-   Jitni keys lagai hain, request KEY #1 se shuru — fail (quota/rate-limit/busy/invalid)
-   to agli key, phir agli… sab fail to backoff ke sath poora round dobara (2 rounds). */
+/* ---------- Gemini — BULK KEYS + rotation ---------- */
 const GLM_BASE='https://generativelanguage.googleapis.com/v1beta';
-const modelCache=new Map(); // keyIndex -> model name
+const modelCache=new Map();
 
 function suggestedModel(raw){
   const m=String(raw||'').match(/models\/([a-z0-9._\-]+)/i);
   return m ? m[1] : null;
 }
-
-/* har key ka apna available-model resolution */
 async function resolveModelForKey(ki){
   if(modelCache.has(ki)) return modelCache.get(ki);
   const key=keys.geminiKeys[ki];
@@ -569,7 +662,6 @@ async function resolveModelForKey(ki){
   modelCache.set(ki,pref);
   return pref;
 }
-
 async function callGemini(ki, model, prompt){
   const key=keys.geminiKeys[ki];
   let res;
@@ -579,7 +671,7 @@ async function callGemini(ki, model, prompt){
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
         contents:[{role:'user', parts:[{text:prompt}]}],
-        generationConfig:{ temperature:0.35, responseMimeType:'application/json' }
+        generationConfig:{ temperature:0.4, responseMimeType:'application/json' }
       })
     });
   }catch(e){ throw new Error('network fail — internet check karein'); }
@@ -593,12 +685,11 @@ async function callGemini(ki, model, prompt){
       'HTTP '+res.status;
     const err=new Error(msg); err.raw=raw; err.status=res.status;
     const sug=suggestedModel(raw);
-    if(sug && sug!==model){ modelCache.set(ki,sug); err.modelSwitched=sug; } // agli koshish isi key par naye model se
+    if(sug && sug!==model){ modelCache.set(ki,sug); err.modelSwitched=sug; }
     throw err;
   }
   return res.json();
 }
-
 let switches=0;
 async function geminiWithRetry(prompt){
   const n=keys.geminiKeys.length;
@@ -615,7 +706,7 @@ async function geminiWithRetry(prompt){
         const model=await resolveModelForKey(ki);
         log(`KEY #${ki+1} → ${model} par request…`);
         const data=await callGemini(ki, model, prompt);
-        markKey(ki,'ok','breakdown ok — KEY #'+(ki+1)+' ne kaam kiya');
+        markKey(ki,'ok','KEY #'+(ki+1)+' ne kaam kiya');
         return data;
       }catch(e){
         lastErr=e;
@@ -623,7 +714,7 @@ async function geminiWithRetry(prompt){
           switches++;
           markKey(ki,'idle','model switch: '+e.modelSwitched);
           log(`KEY #${ki+1} → deprecation — ${e.modelSwitched} par switch, same key se dobara…`,'err');
-          ki--; continue; // usi key par naye model se retry
+          ki--; continue;
         }
         markKey(ki,'fail',shortErr(e));
         log(`KEY #${ki+1} FAIL — ${shortErr(e)} → KEY #${((ki+1)%n)+1} par ja rahe hain…`,'err');
@@ -632,22 +723,38 @@ async function geminiWithRetry(prompt){
   }
   throw lastErr || new Error('Gemini fail — sab keys try ho gayin');
 }
-
-async function geminiBreakdown(script){
-  const prompt=buildPrompt(script);
-  log(`${keys.geminiKeys.length} Gemini keys loaded — rotation ON (fail → agli key)`);
-  const data=await geminiWithRetry(prompt);
+function parseScenesJSON(data, fallbackSeed){
   let txt=(data?.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();
   txt=txt.replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
   let parsed;
   try{ parsed=JSON.parse(txt); }catch(e){ throw new Error('AI ka JSON parse nahi hua — dobara try karein'); }
   const arr=Array.isArray(parsed)?parsed:parsed.scenes;
   if(!Array.isArray(arr)||!arr.length) throw new Error('AI ne koi scene return nahi ki');
+  return arr;
+}
+async function geminiScriptBreakdown(script){
+  log(`${keys.geminiKeys.length} Gemini keys loaded — rotation ON (fail → agli key)`);
+  const data=await geminiWithRetry(buildPrompt(script));
+  const arr=parseScenesJSON(data);
   return arr.slice(0,12).map((s,i)=>({
     sceneNumber: +s.sceneNumber||i+1,
     script: String(s.script||'').trim(),
     keywords: cleanQuery(s.keywords) || fallbackQuery(s.script),
     visual: String(s.visual||'').trim(),
+    status:'done', clips:[], errors:[], statusLog:[]
+  }));
+}
+/* TOPIC MODE — topic se 10 diverse queries */
+async function geminiTopicBreakdown(topic){
+  log(`${keys.geminiKeys.length} Gemini keys loaded — rotation ON (fail → agli key)`);
+  log(`TOPIC RESEARCH — "${topic}" ke 10 visual angles dhoondh raha hai…`);
+  const data=await geminiWithRetry(buildTopicPrompt(topic));
+  const arr=parseScenesJSON(data, topic);
+  return arr.slice(0,12).map((s,i)=>({
+    sceneNumber: +s.sceneNumber||i+1,
+    script: String(s.visual||s.keywords||topic).trim(),
+    keywords: cleanQuery(s.keywords) || fallbackQuery(topic),
+    visual:'',
     status:'done', clips:[], errors:[], statusLog:[]
   }));
 }
@@ -857,7 +964,7 @@ function updateCounts(){
   const tot=state.scenes.reduce((a,s)=>a+s.clips.length,0);
   $('#rmeta').innerHTML=`${pad(state.scenes.length)} SCENES · ${pad(tot)} CLIPS · <b>${pad(selections.size)} PICKED</b>`;
   $('#trayCount').innerHTML=`<b>${pad(selections.size)}</b> CLIPS PICKED`;
-  const on=selections.size>0&&state.scenes.length>0;
+  const on=state.scenes.length>0;
   $('#tray').classList.toggle('on',on);
   document.body.classList.toggle('tray-on',on);
 }
@@ -929,22 +1036,94 @@ async function reSearch(idx,q){
   toast(`SC.${pad(s.sceneNumber)} — ${s.clips.length} clips mile`, s.clips.length?'ok':'warn');
 }
 
-/* ================= download ================= */
+/* ================= download — single ================= */
+async function saveBlob(url, name){
+  const r=await fetch(url);
+  if(!r.ok) throw new Error('HTTP '+r.status);
+  const b=await r.blob();
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(b); a.download=name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
 async function downloadClip(clip,s){
   toast('Download shuru ho gaya…');
   try{
-    const r=await fetch(clip.download);
-    if(!r.ok) throw 0;
-    const b=await r.blob();
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(b);
-    a.download=`cutlist-sc${pad(s.sceneNumber)}-${clip.source.toLowerCase()}.mp4`;
-    document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    await saveBlob(clip.download, `cutlist-sc${pad(s.sceneNumber)}-${clip.source.toLowerCase()}.mp4`);
     toast('Clip download ho gayi');
   }catch(_){
     window.open(clip.download,'_blank','noopener');
-    toast('Browser ne direct download block kiya — video naye tab me khul gayi','warn');
+    toast('Direct download block hua — video naye tab me khul gayi','warn');
+  }
+}
+
+/* ================= ZIP — 1 click bulk download ================= */
+function collectClips(modeZip){
+  const out=[]; const seen=new Set();
+  state.scenes.forEach(s=>{
+    let cl=[];
+    if(modeZip==='all') cl=s.clips;
+    else{
+      const id=selections.get(s.sceneNumber);
+      const c=(id&&findClip(s,id))||s.clips[0];
+      if(c) cl=[c];
+    }
+    cl.forEach(c=>{ if(c&&c.download&&!seen.has(c.id)){ seen.add(c.id); out.push({scene:s, clip:c}); } });
+  });
+  return out;
+}
+function clipFileName(entry,i){
+  const c=entry.clip;
+  const ext=((c.download||'').match(/\.(mp4|webm|mov|ogg)(?:\?|$)/i)||[])[1]||'mp4';
+  return `sc${pad(entry.scene.sceneNumber)}-${String(i+1).padStart(2,'0')}-${c.source.toLowerCase()}-${c.id}.${ext}`;
+}
+let zipping=false;
+async function zipClips(modeZip, btn){
+  if(zipping) return;
+  if(!state.scenes.length){ toast('Pehle script ya topic break down karein','warn'); return; }
+  const items=collectClips(modeZip);
+  if(!items.length){ toast('Download ke liye koi clip nahi mili','warn'); return; }
+  zipping=true;
+  const lbl=btn.querySelector('.lbl')||btn;
+  const orig=lbl.textContent;
+  btn.disabled=true;
+  let fails=0;
+  try{
+    if(window.JSZip){
+      if(items.length>20) toast(`${items.length} clips — thora waqt lagega, button par progress dekhein…`);
+      const zip=new JSZip();
+      for(let i=0;i<items.length;i++){
+        const e=items[i];
+        lbl.textContent=`FETCH ${i+1}/${items.length}`;
+        try{ zip.file(clipFileName(e,i), await (await fetch(e.clip.download)).blob()); }
+        catch(_){ fails++; }
+        await sleep(120);
+      }
+      lbl.textContent='ZIPPING…';
+      const blob=await zip.generateAsync(
+        {type:'blob', compression:'STORE'},
+        m=>{ lbl.textContent='ZIP '+Math.round(m.percent)+'%'; }
+      );
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download = modeZip==='all' ? 'cutlist-all-clips.zip' : 'cutlist-picks.zip';
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(()=>URL.revokeObjectURL(a.href),8000);
+      toast(`ZIP download shuru: ${items.length-fails}/${items.length} clips${fails?` — ${fails} fetch fail`:''}`, fails?'warn':'ok');
+    }else{
+      toast('ZIP engine load nahi hua — clips ek-ek kar ke download ho rahi hain','warn');
+      let ok=0;
+      for(let i=0;i<items.length;i++){
+        const e=items[i];
+        lbl.textContent=`${i+1}/${items.length}`;
+        try{ await saveBlob(e.clip.download, clipFileName(e,i)); ok++; }
+        catch(_){ fails++; }
+        await sleep(900);
+      }
+      toast(`${ok} clips download ho gayin${fails?`, ${fails} fail`:''}`, fails?'warn':'ok');
+    }
+  } finally {
+    zipping=false; btn.disabled=false; lbl.textContent=orig;
   }
 }
 
@@ -955,13 +1134,12 @@ function buildTextList(){
     const pickId=selections.get(s.sceneNumber);
     const c=pickId?findClip(s,pickId):s.clips[0];
     L.push(`SCENE ${pad(s.sceneNumber)}`,
-      `Script : ${s.script}`,
+      `Angle  : ${s.script}`,
       `Query  : ${s.keywords}`,
-      s.visual?`Visual : ${s.visual}`:null,
       c?`Pick   : [${c.source}] ${c.page}${pickId?'':'  (auto-recommended)'}`:'Pick   : — koi clip nahi mili',
       `Search : ${srcLinks(s.keywords).replace(/\s+/g,' ').trim()}`,'');
   });
-  return L.filter(x=>x!==null).join('\n');
+  return L.join('\n');
 }
 async function copyList(){
   if(!state.scenes.length) return;
@@ -990,26 +1168,58 @@ function exportJson(){
 }
 
 /* ================= main pipeline ================= */
-const scriptEl=$('#scriptInput'), btnGo=$('#btnGo');
+const btnGo=$('#btnGo'), btnGoTopic=$('#btnGoTopic');
 let busy=false;
 async function runPipeline(){
   if(busy) return;
-  const script=scriptEl.value.trim();
-  if(wordCount(script)<8){ toast('Script bohat chhoti hai — thora tafseel ke sath paste karein','warn'); scriptEl.focus(); return; }
   if(!keys.geminiKeys.length){
     $('#keyPanel').classList.remove('hidden'); kKeys.focus();
     toast('Pehle apni Gemini key(s) paste karein — har line par ek (API KEYS)','warn');
     return;
   }
-  busy=true; btnGo.disabled=true; btnGo.firstChild.textContent='ROLLING… ';
-  switches=0;
-  startOverlay(); setStep(2);
+
+  let scenes;
+  if(mode==='topic'){
+    const topic=topicEl.value.trim();
+    if(topic.length<3){ toast('Topic likhein — misal: real animal rescue','warn'); topicEl.focus(); return; }
+    busy=true; btnGoTopic.disabled=true; btnGoTopic.firstChild.textContent='ROLLING… ';
+    switches=0; startOverlay(); setStep(2);
+    try{
+      log(`SCRIPT RECEIVED — TOPIC MODE: "${topic}"`);
+      scenes=await geminiTopicBreakdown(topic);
+      log(`${scenes.length} visual angles tayyar ho gaye`,'ok');
+    }catch(err){
+      log(String(err.message||err),'err');
+      endOverlay(1500);
+      setTimeout(()=>toast('Analysis fail: '+(err.message||err),'warn'),1550);
+      return;
+    }finally{
+      busy=false; btnGoTopic.disabled=false; btnGoTopic.firstChild.textContent='FIND CLIPS ';
+    }
+  }else{
+    const script=scriptEl.value.trim();
+    if(wordCount(script)<8){ toast('Script bohat chhoti hai — thora tafseel ke sath paste karein','warn'); scriptEl.focus(); return; }
+    busy=true; btnGo.disabled=true; btnGo.firstChild.textContent='ROLLING… ';
+    switches=0; startOverlay(); setStep(2);
+    try{
+      log(`SCRIPT RECEIVED — ${wordCount(script)} words`);
+      log('GEMINI — script breakdown chal raha hai…');
+      scenes=await geminiScriptBreakdown(script);
+      log(`${scenes.length} scenes identify ho gaye`,'ok');
+    }catch(err){
+      log(String(err.message||err),'err');
+      endOverlay(1500);
+      setTimeout(()=>toast('Analysis fail: '+(err.message||err),'warn'),1550);
+      return;
+    }finally{
+      busy=false; btnGo.disabled=false; btnGo.firstChild.textContent='BREAK DOWN SCRIPT ';
+    }
+  }
+
+  /* shared: clip sourcing */
+  busy=true; setStep(3);
   try{
-    log(`SCRIPT RECEIVED — ${wordCount(script)} words`);
-    log('GEMINI — script breakdown chal raha hai…');
-    state.scenes=await geminiBreakdown(script);
-    log(`${state.scenes.length} scenes identify ho gaye`,'ok');
-    setStep(3);
+    state.scenes=scenes;
     const nSrc=enabledSources().length;
     log(`Clip chain: ${nSrc} sources (PEXELS → PIXABAY → WIKIMEDIA → ARCHIVE)…`);
     for(let i=0;i<state.scenes.length;i+=3){
@@ -1027,14 +1237,14 @@ async function runPipeline(){
     endOverlay(600);
     setTimeout(()=>{
       $('#stageResults').scrollIntoView({behavior:'smooth'});
-      toast(`${state.scenes.length} scenes breakdown ho gaye — clips select karein`);
+      toast(`${state.scenes.length} scenes breakdown ho gaye — clips select karein ya ZIP download dabayen`);
     },650);
   }catch(err){
     log(String(err.message||err),'err');
     endOverlay(1500);
-    setTimeout(()=>toast('Analysis fail: '+(err.message||err),'warn'),1550);
+    setTimeout(()=>toast('Clip search fail: '+(err.message||err),'warn'),1550);
   }finally{
-    busy=false; btnGo.disabled=false; btnGo.firstChild.textContent='BREAK DOWN SCRIPT ';
+    busy=false;
   }
 }
 
@@ -1046,10 +1256,17 @@ async function runPipeline(){
 });
  $('#keyBtn').addEventListener('click',()=>$('#keyPanel').classList.toggle('hidden'));
  $('#btnSample').addEventListener('click',()=>{
+  setMode('script');
   scriptEl.value=SAMPLE; scriptEl.dispatchEvent(new Event('input'));
   toast('Sample script load ho gayi — ab BREAK DOWN SCRIPT dabain');
 });
 btnGo.addEventListener('click',runPipeline);
+btnGoTopic.addEventListener('click',runPipeline);
+topicEl.addEventListener('keydown',e=>{ if(e.key==='Enter') runPipeline(); });
+topicEl.addEventListener('input',()=>localStorage.setItem('cutlist.topic',topicEl.value));
+document.querySelectorAll('.qchip').forEach(b=>b.addEventListener('click',()=>{
+  topicEl.value=b.dataset.topic; topicEl.dispatchEvent(new Event('input'));
+}));
 scriptEl.addEventListener('input',()=>{
   localStorage.setItem('cutlist.script',scriptEl.value);
   $('#wcount').innerHTML=`<b>${wordCount(scriptEl.value)}</b> WORDS · <b>${scriptEl.value?scriptEl.value.split('\n').length:0}</b> LINES · AUTOSAVED`;
@@ -1059,6 +1276,9 @@ scriptEl.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key==='Ent
  $('#trayCopy').addEventListener('click',copyList);
  $('#btnExport').addEventListener('click',exportJson);
  $('#trayExport').addEventListener('click',exportJson);
+ $('#btnZipAll').addEventListener('click',e=>zipClips('all', e.currentTarget));
+ $('#btnZipPicks').addEventListener('click',e=>zipClips('picks', e.currentTarget));
+ $('#trayZip').addEventListener('click',e=>zipClips('picks', e.currentTarget));
  $('#trayClear').addEventListener('click',()=>{
   selections.clear(); renderAll();
   toast('Picks clear ho gaye');
@@ -1068,6 +1288,7 @@ scriptEl.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key==='Ent
 loadKeys();
 scriptEl.value=localStorage.getItem('cutlist.script')||'';
 scriptEl.dispatchEvent(new Event('input'));
+topicEl.value=localStorage.getItem('cutlist.topic')||'';
 setStep(1);
 </script>
 </body>
