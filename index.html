@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CUTLIST — Script to B-Roll Breakdown</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&display=swap" rel="stylesheet">
+<style>
+/* ============ CUTLIST — shooting-script aesthetic ============ */
+:root{
+  --paper:#F2EDE3; --paper-2:#FBF8F1; --ink:#191713; --ink-2:#6E675B;
+  --red:#C63A21; --red-dk:#A02D18; --film:#0E0D0C;
+  --mono:'Courier Prime',monospace; --disp:'Fraunces',serif; --ui:'Archivo',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:var(--ui);-webkit-font-smoothing:antialiased;transition:padding-bottom .3s}
+body.tray-on{padding-bottom:76px}
+::selection{background:var(--red);color:var(--paper)}
+:focus-visible{outline:2px solid var(--red);outline-offset:2px}
+button{font-family:var(--ui)}
+a{color:inherit}
+
+/* halka film-grain — poore page par ek jaisa texture */
+body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.45;mix-blend-mode:multiply;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0.35 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");}
+
+/* clapper-stripe (clapstick) — top par signature strip */
+.clapstrip{height:12px;border-bottom:2px solid var(--ink);
+  background:repeating-linear-gradient(45deg,var(--ink) 0 14px,var(--paper-2) 14px 28px);}
+
+.wrap{max-width:1160px;margin:0 auto;padding:0 24px}
+.hidden{display:none!important}
+
+/* ============ Masthead ============ */
+.masthead{display:flex;justify-content:space-between;align-items:center;gap:18px;padding:22px 0 6px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:14px}
+.bmark{flex:none;color:var(--ink)}
+.brand h1{font:700 32px/1 var(--disp);letter-spacing:-.01em}
+.brand h1 i{font-style:normal;color:var(--red)}
+.brand p{font:600 10px var(--ui);letter-spacing:.26em;color:var(--ink-2);margin-top:5px}
+.mright{display:flex;align-items:center;gap:16px}
+.tally{width:9px;height:9px;border-radius:50%;background:rgba(25,23,19,.18);flex:none}
+.tally.live{background:var(--red);animation:blink 1s steps(2) infinite}
+@keyframes blink{50%{opacity:.25}}
+.badge{width:7px;height:7px;border-radius:50%;background:var(--red);display:none}
+.badge.miss{display:inline-block}
+
+/* ============ Buttons ============ */
+.btn{font:600 11.5px/1 var(--ui);letter-spacing:.15em;text-transform:uppercase;padding:13px 18px;
+  border:1px solid var(--ink);background:var(--ink);color:var(--paper);cursor:pointer;
+  display:inline-flex;align-items:center;gap:9px;transition:all .15s;text-decoration:none}
+.btn:hover{background:var(--red);border-color:var(--red);transform:translate(-1px,-1px);box-shadow:4px 4px 0 var(--ink)}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.ghost:hover{border-color:var(--red);color:var(--red);box-shadow:3px 3px 0 rgba(25,23,19,.25)}
+.btn.big{padding:17px 26px;font-size:13px}
+.btn.sm{padding:10px 14px;font-size:10.5px}
+.btn:disabled{opacity:.45;cursor:wait;transform:none;box-shadow:none}
+.btn .ic{display:inline-flex}
+
+/* ============ API keys panel ============ */
+.keypanel{border:1px solid var(--ink);background:var(--paper-2);box-shadow:6px 6px 0 rgba(25,23,19,.1);
+  padding:20px 22px;margin-top:14px}
+.kp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px}
+.kp-grid label{display:flex;flex-direction:column;gap:7px;font:600 10px var(--ui);letter-spacing:.18em;color:var(--ink-2)}
+.kp-grid input{font:14px var(--mono);padding:10px 12px;border:1px solid rgba(25,23,19,.4);background:var(--paper);color:var(--ink);caret-color:var(--red)}
+.kp-grid input:focus{outline:0;border-color:var(--red)}
+.kp-note{font:12.5px/1.7 var(--ui);color:var(--ink-2);margin-top:16px;border-top:1px dashed rgba(25,23,19,.3);padding-top:12px}
+.kp-note a{color:var(--red)}
+
+/* ============ Workflow steps ============ */
+.steps{display:flex;align-items:center;gap:14px;margin:30px 0 34px;flex-wrap:wrap}
+.step{display:flex;align-items:center;gap:9px;font:600 10.5px var(--ui);letter-spacing:.16em;color:var(--ink-2)}
+.step .no{font:700 12px var(--mono);border:1px solid currentColor;width:25px;height:25px;display:grid;place-items:center;flex:none}
+.step.on{color:var(--red)}
+.step.done{color:var(--ink)}
+.step.done .no{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.srule{flex:1;min-width:16px;height:1px;background:rgba(25,23,19,.25)}
+
+/* ============ Script sheet (screenplay page) ============ */
+.sheet{position:relative;background:var(--paper-2);border:1px solid var(--ink);box-shadow:8px 8px 0 rgba(25,23,19,.12)}
+.sheethead{display:flex;justify-content:space-between;align-items:center;padding:13px 20px;
+  border-bottom:1px solid rgba(25,23,19,.2);font:600 10.5px var(--ui);letter-spacing:.22em;color:var(--ink)}
+.sheethead .pg{color:var(--ink-2)}
+.margin-line{position:absolute;left:76px;top:53px;bottom:0;width:1px;background:rgba(198,58,33,.4);pointer-events:none}
+#scriptInput{display:block;width:100%;min-height:360px;max-height:60vh;resize:vertical;
+  background:transparent;border:0;outline:0;color:var(--ink);caret-color:var(--red);
+  font:15.5px/1.95 var(--mono);padding:26px 30px 34px 96px}
+#scriptInput::placeholder{color:rgba(110,103,91,.7)}
+#scriptInput::selection{background:rgba(198,58,33,.25);color:var(--ink)}
+.wcount{font:11px var(--mono);letter-spacing:.08em;color:var(--ink-2);margin-top:12px;display:flex;gap:8px}
+.wcount b{color:var(--ink);font-weight:700}
+.actionbar{display:flex;justify-content:space-between;align-items:center;gap:18px;margin:20px 0 10px;flex-wrap:wrap}
+.alinks{display:flex;flex-direction:column;gap:8px}
+.sample-link{font:600 11px var(--ui);letter-spacing:.16em;color:var(--ink);background:0;border:0;border-bottom:1px solid var(--ink);
+  cursor:pointer;padding:2px 0;width:max-content;transition:.15s}
+.sample-link:hover{color:var(--red);border-color:var(--red)}
+.hint{font:12px/1.6 var(--ui);color:var(--ink-2);max-width:52ch}
+.hint b{color:var(--ink)}
+
+/* ============ Results header ============ */
+.rhead{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;
+  border-bottom:2px solid var(--ink);padding:10px 0 18px;margin-bottom:26px}
+.rhead h2{font:700 clamp(30px,4.5vw,44px)/1 var(--disp)}
+.rmeta{font:12px var(--mono);letter-spacing:.08em;color:var(--ink-2);margin-top:9px}
+.rmeta b{color:var(--red);font-weight:700}
+.racts{display:flex;gap:10px;flex-wrap:wrap}
+
+/* ============ Scene breakdown sheet ============ */
+.scene{display:grid;grid-template-columns:96px 1fr;border:1px solid var(--ink);background:var(--paper-2);
+  box-shadow:7px 7px 0 rgba(25,23,19,.1);margin-bottom:30px}
+.rail{background:var(--ink);color:var(--paper);display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 0 16px}
+.rlbl{font:600 10px var(--ui);letter-spacing:.3em;opacity:.55}
+.rnum{font:700 42px/1 var(--disp)}
+.pick-mark{margin-top:auto;background:var(--red);color:var(--paper);font:700 9px var(--ui);letter-spacing:.18em;
+  padding:4px 7px;transform:rotate(-6deg)}
+.sbody{min-width:0;display:flex;flex-direction:column}
+.shead{padding:20px 24px 18px;display:flex;flex-direction:column;gap:12px}
+.scriptline{font:16.5px/1.75 var(--mono);max-width:72ch;border-left:3px solid var(--red);padding-left:14px}
+.vline{display:flex;align-items:center;gap:8px;font:italic 13.5px var(--ui);color:var(--ink-2);padding-left:17px}
+.vline svg{flex:none;color:var(--red)}
+.krow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding-left:17px}
+.klbl{font:600 9.5px var(--ui);letter-spacing:.22em;color:var(--ink-2)}
+.kw-input{font:700 13.5px var(--mono);background:transparent;border:0;border-bottom:1px dashed rgba(25,23,19,.45);
+  padding:4px 2px;width:min(360px,58vw);color:var(--ink);caret-color:var(--red)}
+.kw-input:focus{outline:0;border-bottom-color:var(--red);border-bottom-style:solid}
+.ibtn{width:30px;height:30px;display:grid;place-items:center;background:transparent;border:1px solid var(--ink);
+  color:var(--ink);cursor:pointer;transition:.15s;flex:none}
+.ibtn:hover{background:var(--red);border-color:var(--red);color:var(--paper)}
+
+/* filmstrip — sprocket holes ke sath */
+.stripwrap{position:relative;background:var(--film);border-top:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+.fs-prock{position:absolute;left:0;right:0;height:9px;opacity:.8;pointer-events:none;
+  background-image:radial-gradient(circle at center,#EFE9DC 0 3px,transparent 3.7px);background-size:26px 9px}
+.fs-prock.top{top:5px}.fs-prock.bot{bottom:5px}
+.strip{display:flex;gap:16px;overflow-x:auto;padding:24px 24px 26px;scroll-snap-type:x proximity}
+.strip::-webkit-scrollbar{height:8px}
+.strip::-webkit-scrollbar-thumb{background:rgba(242,237,227,.25)}
+.strip.empty{flex-direction:column;align-items:flex-start;gap:14px;min-height:150px;justify-content:center}
+.strip.empty p{font:12.5px/1.7 var(--mono);color:rgba(242,237,227,.85);max-width:72ch}
+.strip.loading{justify-content:center;align-items:center;min-height:150px}
+.ldots{font:700 12px var(--mono);letter-spacing:.2em;color:rgba(242,237,227,.9)}
+.ldots .d{animation:dot 1.2s infinite}
+.ldots .d:nth-child(2){animation-delay:.2s}
+.ldots .d:nth-child(3){animation-delay:.4s}
+@keyframes dot{0%,100%{opacity:.15}50%{opacity:1}}
+.nlinks{display:flex;gap:20px;flex-wrap:wrap}
+.nlinks a{font:700 11px var(--mono);letter-spacing:.1em;color:var(--paper);text-decoration:underline;text-underline-offset:4px}
+.nlinks a:hover{color:var(--red)}
+
+/* frame (clip) */
+.frame{width:238px;flex:none;scroll-snap-align:start}
+.frame.sel .ph{outline:2px solid var(--red);outline-offset:-2px}
+.ph{position:relative;aspect-ratio:16/9;background:#1A1815;overflow:hidden;cursor:pointer}
+.ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .35s,opacity .25s}
+.frame:hover .ph img{transform:scale(1.045)}
+.ph video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .25s;background:#000}
+.ph.video-on video{opacity:1}
+.ph.video-on img{opacity:0}
+.dur{position:absolute;left:6px;top:6px;font:700 10px var(--mono);background:rgba(14,13,12,.82);color:var(--paper);padding:3px 6px;letter-spacing:.05em}
+.rec{position:absolute;right:6px;top:6px;font:700 8.5px var(--ui);letter-spacing:.14em;background:var(--paper);color:var(--ink);padding:3px 6px;border:1px solid var(--ink)}
+.picked-tag{position:absolute;right:6px;top:6px;display:inline-flex;align-items:center;gap:5px;
+  font:700 8.5px var(--ui);letter-spacing:.14em;background:var(--red);color:var(--paper);padding:4px 7px;transform:rotate(-3deg)}
+.acts{position:absolute;right:6px;bottom:6px;display:flex;gap:6px;opacity:0;transform:translateY(4px);transition:.2s}
+.frame:hover .acts,.ph.video-on .acts{opacity:1;transform:none}
+@media (hover:none){.acts{opacity:1;transform:none}}
+.abtn{width:30px;height:30px;display:grid;place-items:center;background:rgba(14,13,12,.85);
+  border:1px solid rgba(242,237,227,.35);color:var(--paper);cursor:pointer;transition:.15s;padding:0}
+.abtn:hover{background:var(--red);border-color:var(--red)}
+.abtn.on{background:var(--red);border-color:var(--red)}
+.cap{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 2px 0;
+  font:10.5px var(--mono);color:rgba(242,237,227,.65)}
+.stamp{border:1px solid rgba(242,237,227,.5);padding:2px 6px;letter-spacing:.14em;font-weight:700;color:rgba(242,237,227,.9)}
+
+/* sources row */
+.srcrow{display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding:11px 24px 14px;
+  border-top:1px solid rgba(25,23,19,.15);font:11px var(--mono);letter-spacing:.06em;color:var(--ink-2)}
+.srcrow b{color:var(--ink)}
+.srclink{margin-right:auto;display:inline-flex;align-items:center;gap:5px;color:var(--ink);
+  text-decoration:underline;text-underline-offset:4px;font-weight:700}
+.srclink:hover{color:var(--red)}
+.retry{margin-left:auto;display:inline-flex;align-items:center;gap:6px;font:700 10px var(--ui);letter-spacing:.16em;
+  border:1px solid var(--red);color:var(--red);background:transparent;padding:5px 9px;cursor:pointer;transition:.15s}
+.retry:hover{background:var(--red);color:var(--paper)}
+
+/* ============ Processing overlay — film leader countdown ============ */
+#overlay{position:fixed;inset:0;z-index:100;background:#0F0E0C;color:var(--paper);
+  display:flex;align-items:center;justify-content:center;gap:70px;padding:30px;
+  visibility:hidden;opacity:0;transition:opacity .4s,visibility .4s;overflow:hidden}
+#overlay.on{visibility:visible;opacity:1}
+.cross-h{position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(242,237,227,.1)}
+.cross-v{position:absolute;top:0;bottom:0;left:50%;width:1px;background:rgba(242,237,227,.1)}
+.ldwrap{display:flex;flex-direction:column;align-items:center;gap:20px;position:relative}
+.ld{position:relative;width:min(240px,58vw);aspect-ratio:1}
+.ld svg{width:100%;height:100%;display:block}
+.ld-arc{stroke-dasharray:565.5;transform-origin:120px 120px;transform:rotate(-90deg);animation:ldwipe 1s linear infinite}
+@keyframes ldwipe{from{stroke-dashoffset:565.5}to{stroke-dashoffset:0}}
+.ld-sweep{transform-origin:120px 120px;animation:ldspin 1s linear infinite}
+@keyframes ldspin{to{transform:rotate(360deg)}}
+.ldnum{position:absolute;inset:0;display:grid;place-items:center;font:700 104px/1 var(--disp)}
+.ldnum.pop{animation:pop .5s ease}
+@keyframes pop{from{transform:scale(1.15);opacity:.35}}
+.ldtag{font:600 10.5px var(--ui);letter-spacing:.34em;color:var(--red)}
+.logpanel{position:relative;width:min(440px,86vw);height:300px;overflow-y:auto;border:1px solid rgba(242,237,227,.25);
+  padding:16px 18px;font:12.5px/2 var(--mono);background:rgba(14,13,12,.5)}
+.logline{opacity:0;transform:translateY(4px);animation:lin .3s forwards}
+@keyframes lin{to{opacity:1;transform:none}}
+.lt{color:var(--red);margin-right:10px}
+.logline.ok{color:#BFD8B8}
+.logline.err{color:#E8836F}
+
+/* ============ Bin tray ============ */
+#tray{position:fixed;left:0;right:0;bottom:0;z-index:60;background:var(--ink);color:var(--paper);
+  display:flex;align-items:center;gap:16px;padding:13px 24px;flex-wrap:wrap;
+  transform:translateY(110%);transition:transform .3s;border-top:2px solid var(--red)}
+#tray.on{transform:none}
+.tlabel{font:700 11px var(--ui);letter-spacing:.3em}
+.tcount{font:700 13px var(--mono);letter-spacing:.06em}
+.tcount b{color:var(--red)}
+.tsep{flex:1}
+.tbtn{background:transparent;border:1px solid rgba(242,237,227,.4);color:var(--paper);
+  font:600 10.5px var(--ui);letter-spacing:.16em;padding:10px 14px;cursor:pointer;
+  display:inline-flex;gap:8px;align-items:center;transition:.15s}
+.tbtn:hover{border-color:var(--red);background:var(--red)}
+
+/* ============ Toasts ============ */
+#toasts{position:fixed;right:20px;bottom:84px;z-index:120;display:flex;flex-direction:column;gap:10px;max-width:min(380px,90vw)}
+.toast{background:var(--ink);color:var(--paper);border-left:3px solid var(--red);padding:11px 15px;
+  font:13px/1.5 var(--ui);box-shadow:4px 4px 0 rgba(25,23,19,.25);animation:tin .25s ease}
+.toast.warn{border-left-color:#E8836F}
+.toast.out{opacity:0;transform:translateX(10px);transition:.3s}
+@keyframes tin{from{opacity:0;transform:translateY(8px)}}
+
+/* ============ Responsive ============ */
+@media (max-width:880px){
+  .scene{grid-template-columns:1fr}
+  .rail{flex-direction:row;padding:12px 18px;gap:12px;border-bottom:1px solid rgba(242,237,227,.15)}
+  .pick-mark{margin-top:0;margin-left:auto}
+  .rnum{font-size:26px}
+  #scriptInput{padding-left:88px}
+  .margin-line{left:70px}
+  #overlay{flex-direction:column;gap:26px}
+  .logpanel{height:170px}
+  .frame{width:210px}
+  .actionbar{flex-direction:column;align-items:stretch}
+  .actionbar .btn{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<div class="clapstrip"></div>
+
+<header class="wrap masthead">
+  <div class="brand">
+    <svg class="bmark" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1-.3 2.1.3 2.4 1.3Z"/>
+      <path d="m6.2 5.3 3.1 3.9"/><path d="m12.4 3.4 3.1 4"/>
+      <path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>
+    </svg>
+    <div>
+      <h1>CUTLIST<i>.</i></h1>
+      <p>SCRIPT → B-ROLL BREAKDOWN</p>
+    </div>
+  </div>
+  <div class="mright">
+    <span id="tally" class="tally" title="Processing indicator"></span>
+    <button id="keyBtn" class="btn ghost sm"><span class="ic" data-icon="key"></span>API KEYS<span id="keyBadge" class="badge miss" title="Gemini key set nahi hai"></span></button>
+  </div>
+</header>
+
+<!-- API keys -->
+<section class="wrap">
+  <div id="keyPanel" class="keypanel hidden">
+    <div class="kp-grid">
+      <label>GEMINI — REQUIRED (GOOGLE AI STUDIO)<input type="password" id="kGemini" placeholder="Apni Gemini API key paste karein" autocomplete="off"></label>
+      <label>PEXELS — OPTIONAL<input type="password" id="kPexels" placeholder="pexels.com/api se free key" autocomplete="off"></label>
+      <label>PIXABAY — OPTIONAL<input type="password" id="kPixabay" placeholder="pixabay.com/api/docs se free key" autocomplete="off"></label>
+    </div>
+    <p class="kp-note">
+      Keys sirf aapke browser ke localStorage me save hoti hain — kahin bheji nahi jatin (double-click karke show/hide kar sakte hain).
+      Gemini key <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio</a> se,
+      Pexels key <a href="https://www.pexels.com/api/" target="_blank" rel="noopener">pexels.com/api</a> se aur
+      Pixabay key <a href="https://pixabay.com/api/docs/" target="_blank" rel="noopener">pixabay.com/api/docs</a> se free milti hai.
+      Pinterest ki koi public video-search API nahi hoti, is liye har scene ke sath direct Pinterest search link diya jata hai.
+    </p>
+  </div>
+</section>
+
+<!-- Workflow steps -->
+<nav class="wrap steps" aria-label="Workflow">
+  <div class="step on" id="st1"><span class="no">01</span>SCRIPT</div><span class="srule"></span>
+  <div class="step" id="st2"><span class="no">02</span>AI ANALYSIS</div><span class="srule"></span>
+  <div class="step" id="st3"><span class="no">03</span>CLIP SOURCING</div><span class="srule"></span>
+  <div class="step" id="st4"><span class="no">04</span>PICK &amp; EXPORT</div>
+</nav>
+
+<main class="wrap">
+
+  <!-- STAGE 1: script input -->
+  <section id="stageInput">
+    <div class="sheet">
+      <div class="sheethead"><span>VIDEO SCRIPT</span><span class="pg">PG. 01 · REV. A</span></div>
+      <div class="margin-line"></div>
+      <textarea id="scriptInput" spellcheck="false" placeholder="Apni complete video script yahan paste karein — English ya koi bhi zubaan.&#10;&#10;AI har scene, sentence aur visual keyword khud identify karega, phir Pexels / Pixabay se matching clips dhoondh dega."></textarea>
+    </div>
+    <div class="wcount" id="wcount"><b>0</b> WORDS · <b>0</b> LINES · AUTOSAVED</div>
+    <div class="actionbar">
+      <div class="alinks">
+        <button class="sample-link" id="btnSample">SAMPLE SCRIPT LOAD KAREIN</button>
+        <p class="hint">Sirf <b>Gemini key zaroori</b> hai. Pexels/Pixabay keys optional hain — lagane par clips tool ke andar hi preview aur download ke sath mil jati hain, warna har scene ke liye direct search links milte hain. Sab kuch aapke browser me hi chalta hai.</p>
+      </div>
+      <button class="btn big" id="btnGo">BREAK DOWN SCRIPT <span class="ic" data-icon="arrow"></span></button>
+    </div>
+  </section>
+
+  <!-- STAGE 2: results -->
+  <section id="stageResults" class="hidden">
+    <div class="rhead">
+      <div>
+        <h2>Breakdown Sheet</h2>
+        <p class="rmeta" id="rmeta">—</p>
+      </div>
+      <div class="racts">
+        <button class="btn ghost" id="btnCopy"><span class="ic" data-icon="clipboard"></span>COPY LIST</button>
+        <button class="btn ghost" id="btnExport"><span class="ic" data-icon="file"></span>EXPORT .JSON</button>
+        <a class="btn ghost" href="#stageInput" id="btnNew">NEW SCRIPT</a>
+      </div>
+    </div>
+    <div id="sceneList"></div>
+  </section>
+
+</main>
+
+<!-- film-leader countdown overlay -->
+<div id="overlay">
+  <div class="cross-h"></div><div class="cross-v"></div>
+  <div class="ldwrap">
+    <div class="ld">
+      <svg viewBox="0 0 240 240">
+        <circle cx="120" cy="120" r="98" fill="none" stroke="rgba(242,237,227,.35)" stroke-width="1.5"/>
+        <line x1="26" y1="120" x2="214" y2="120" stroke="rgba(242,237,227,.18)"/>
+        <line x1="120" y1="26" x2="120" y2="214" stroke="rgba(242,237,227,.18)"/>
+        <circle class="ld-arc" cx="120" cy="120" r="90" fill="none" stroke="#C63A21" stroke-width="3"/>
+        <line class="ld-sweep" x1="120" y1="120" x2="120" y2="26" stroke="#C63A21" stroke-width="2"/>
+      </svg>
+      <div class="ldnum" id="ldNum">3</div>
+    </div>
+    <div class="ldtag">CUTLIST · PROCESSING</div>
+  </div>
+  <div class="logpanel" id="logPanel"></div>
+</div>
+
+<!-- bin tray -->
+<footer id="tray">
+  <span class="tlabel">BIN</span>
+  <span class="tcount" id="trayCount"><b>00</b> CLIPS PICKED</span>
+  <span class="tsep"></span>
+  <button class="tbtn" id="trayCopy"><span class="ic" data-icon="clipboard"></span>COPY LIST</button>
+  <button class="tbtn" id="trayExport"><span class="ic" data-icon="file"></span>EXPORT .JSON</button>
+  <button class="tbtn" id="trayClear"><span class="ic" data-icon="trash"></span>CLEAR</button>
+</footer>
+
+<div id="toasts"></div>
+
+<script>
+/* ================= helpers & icons ================= */
+const $ = s => document.querySelector(s);
+const pad = n => String(n).padStart(2,'0');
+const esc = s => String(s??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const escAttr = s => esc(s).replace(/"/g,'&quot;');
+const fmtDur = s => { s=Math.max(0,Math.round(s||0)); return Math.floor(s/60)+':'+String(s%60).padStart(2,'0'); };
+const wordCount = s => s.trim()? s.trim().split(/\s+/).length : 0;
+
+const PATHS = {
+  play:'<polygon points="6 4 20 12 6 20" fill="currentColor" stroke="none"/>',
+  external:'<path d="M18 13v6a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/>',
+  download:'<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="m7 10 5 5 5-5"/><path d="M12 15V3"/>',
+  refresh:'<path d="M21 12a9 9 0 1 1-2.64-6.36"/><path d="M21 3v6h-6"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  circle:'<circle cx="12" cy="12" r="8"/>',
+  link:'<path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/>',
+  clipboard:'<rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/>',
+  file:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/>',
+  key:'<path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3m-3.5 3.5L19 4"/>',
+  trash:'<path d="M3 6h18M8 6V4a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/>',
+  target:'<circle cx="12" cy="12" r="8"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/>',
+  arrow:'<path d="M5 12h14"/><path d="m13 6 6 6-6 6"/>'
+};
+const I = (n,s=15) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PATHS[n]}</svg>`;
+document.querySelectorAll('[data-icon]').forEach(el => el.innerHTML = I(el.dataset.icon, el.dataset.size||15));
+
+/* ================= state & keys ================= */
+const state = { scenes: [] };
+const selections = new Map();          // sceneNumber -> clipId (ek scene = ek pick)
+const keys = { gemini:'', pexels:'', pixabay:'' };
+
+function loadKeys(){
+  try{ Object.assign(keys, JSON.parse(localStorage.getItem('cutlist.keys')||'{}')); }catch(_){}
+  kGemini.value=keys.gemini||''; kPexels.value=keys.pexels||''; kPixabay.value=keys.pixabay||'';
+  updateKeyStatus();
+}
+function saveKeys(){
+  keys.gemini=kGemini.value.trim(); keys.pexels=kPexels.value.trim(); keys.pixabay=kPixabay.value.trim();
+  localStorage.setItem('cutlist.keys', JSON.stringify(keys));
+  updateKeyStatus();
+}
+function updateKeyStatus(){ $('#keyBadge').classList.toggle('miss', !keys.gemini); }
+
+/* ================= toast ================= */
+function toast(msg, kind='ok'){
+  const t=document.createElement('div');
+  t.className='toast'+(kind==='warn'?' warn':'');
+  t.textContent=msg;
+  $('#toasts').appendChild(t);
+  setTimeout(()=>{ t.classList.add('out'); setTimeout(()=>t.remove(),320); }, 3600);
+}
+
+/* ================= processing overlay + production log ================= */
+const ov=$('#overlay'), logPanel=$('#logPanel'), ldNum=$('#ldNum');
+let cdTimer=null, t0=0, cd=3;
+function log(msg, cls=''){
+  const d=((performance.now()-t0)/1000).toFixed(1);
+  const line=document.createElement('div');
+  line.className='logline '+cls;
+  line.innerHTML=`<span class="lt">${d}s</span>${esc(msg)}`;
+  logPanel.appendChild(line);
+  logPanel.scrollTop=logPanel.scrollHeight;
+}
+function popNum(){ ldNum.textContent=cd; ldNum.classList.remove('pop'); void ldNum.offsetWidth; ldNum.classList.add('pop'); }
+function startOverlay(){
+  ov.classList.add('on'); logPanel.innerHTML=''; t0=performance.now();
+  cd=3; popNum(); clearInterval(cdTimer);
+  cdTimer=setInterval(()=>{ cd = cd===1?3:cd-1; popNum(); },1000);
+  $('#tally').classList.add('live');
+}
+function endOverlay(delay){ clearInterval(cdTimer); setTimeout(()=>{ ov.classList.remove('on'); $('#tally').classList.remove('live'); }, delay); }
+function setStep(n){
+  [1,2,3,4].forEach(i=>{
+    const el=$('#st'+i);
+    el.classList.toggle('on', i===n);
+    el.classList.toggle('done', i<n);
+  });
+}
+
+/* ================= sample script ================= */
+const SAMPLE = `A man walks alone through a rain-soaked city street at night, neon signs glowing in the puddles.
+He stops outside a small coffee shop, its warm light cutting through the cold blue evening.
+Inside, he opens his laptop and starts typing, steam rising from a cup of coffee beside him.
+Close-up: his tired eyes, focused, reflecting lines of code on the screen.
+The clock on the wall ticks past 2 AM. He saves the file and leans back.
+Morning breaks over the city skyline as the sun rises between tall buildings.
+He runs along the waterfront at sunrise, his breath visible in the cold air.
+Montage: hands sketching ideas, a printer spitting out pages, notes pinned to a wall.
+Finally, he closes the laptop, steps outside into the sunlight, and smiles for the first time.`;
+
+/* ================= AI: Gemini breakdown ================= */
+function buildPrompt(script){
+  return `You are a senior video editor preparing a shot list. Analyze the script below and split it into scenes for sourcing stock B-roll footage.
+
+RULES:
+- Maximum 12 scenes. Merge short or closely related lines into one scene when sensible.
+- "script": the exact original sentence(s) from the script for that scene (keep the original language).
+- "keywords": ONE short English stock-footage search query, 2-5 words, visually concrete (objects, actions, places). No abstract words like "feeling", "hope" or "success".
+- "visual": one short sentence describing the needed shot, in the same language as the script.
+
+Respond with JSON only, exactly this shape:
+{"scenes":[{"sceneNumber":1,"script":"...","keywords":"man walking rainy street night","visual":"..."}]}
+
+SCRIPT:
+"""
+ ${script}
+"""`;
+}
+const cleanQuery = q => (Array.isArray(q)?q.join(' '):String(q||''))
+  .replace(/["“”']/g,'').replace(/[^\w\s\-]/g,' ').replace(/\s+/g,' ').trim().toLowerCase()
+  .split(' ').slice(0,6).join(' ');
+function fallbackQuery(script){ // agar AI query na de to script ke pehle 4 lamzi words
+  const stop=new Set(['the','a','an','and','he','she','it','of','in','on','at','to','is','are','was','his','her','with','as','they','then','finally','inside','into','over','past']);
+  return (script||'').toLowerCase().replace(/[^\w\s]/g,' ').split(/\s+/).filter(w=>w&&!stop.has(w)).slice(0,4).join(' ');
+}
+
+async function geminiBreakdown(script){
+  let res;
+  try{
+    res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(keys.gemini)}`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        contents:[{role:'user', parts:[{text:buildPrompt(script)}]}],
+        generationConfig:{ temperature:0.35, responseMimeType:'application/json' }
+      })
+    });
+  }catch(e){ throw new Error('Network error — internet connection check karein. ('+e.message+')'); }
+  if(!res.ok){
+    let msg='Gemini request fail ('+res.status+')';
+    try{ const e=await res.json(); if(e.error?.message) msg=e.error.message; }catch(_){}
+    if(res.status===400||res.status===403) msg+=' — API key check karein';
+    if(res.status===429) msg+=' — rate limit, thori der baad koshish karein';
+    throw new Error(msg);
+  }
+  const data=await res.json();
+  let txt=(data?.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();
+  txt=txt.replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
+  let parsed;
+  try{ parsed=JSON.parse(txt); }catch(e){ throw new Error('AI ka JSON parse nahi hua — dobara try karein'); }
+  const arr=Array.isArray(parsed)?parsed:parsed.scenes;
+  if(!Array.isArray(arr)||!arr.length) throw new Error('AI ne koi scene return nahi ki');
+  return arr.slice(0,12).map((s,i)=>({
+    sceneNumber: +s.sceneNumber||i+1,
+    script: String(s.script||'').trim(),
+    keywords: cleanQuery(s.keywords) || fallbackQuery(s.script),
+    visual: String(s.visual||'').trim(),
+    status:'done', clips:[], errors:[]
+  }));
+}
+
+/* ================= clip sources ================= */
+async function searchPexels(q,key){
+  const r=await fetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(q)}&per_page=4&orientation=landscape`,{headers:{Authorization:key}});
+  if(!r.ok) throw new Error(r.status===429?'rate limit':'HTTP '+r.status);
+  const d=await r.json();
+  return (d.videos||[]).map(v=>{
+    const files=(v.video_files||[]).filter(f=>f.file_type==='video/mp4'&&f.width);
+    const asc=[...files].sort((a,b)=>a.width-b.width);
+    const desc=[...files].sort((a,b)=>b.width-a.width);
+    const preview=(asc.find(f=>f.width>=960)||asc[asc.length-1]||{}).link;
+    const best=desc.find(f=>f.width<=1920)||desc[desc.length-1]||{};
+    return { id:'px'+v.id, source:'PEXELS', page:v.url, thumb:v.image, preview,
+      download:best.link, duration:v.duration, res:best.width?`${best.width}×${best.height}`:'' };
+  });
+}
+async function searchPixabay(q,key){
+  const r=await fetch(`https://pixabay.com/api/videos/?key=${encodeURIComponent(key)}&q=${encodeURIComponent(q)}&per_page=4&safesearch=true`);
+  if(!r.ok) throw new Error(r.status===401?'key ghalat hai':'HTTP '+r.status);
+  const d=await r.json();
+  return (d.hits||[]).map(h=>{
+    const V=h.videos||{};
+    const size=V.large||V.medium||V.small||V.tiny||{};
+    const prev=(V.tiny||V.small||V.medium||size).url;
+    return { id:'pb'+h.id, source:'PIXABAY',
+      page:h.pageURL||('https://pixabay.com/videos/search/'+encodeURIComponent(q)+'/'),
+      thumb:h.picture_id?('https://i.vimeocdn.com/video/'+h.picture_id+'_295x166.jpg'):'',
+      preview:prev, download:size.url, duration:h.duration,
+      res:size.width?`${size.width}×${size.height}`:'' };
+  });
+}
+async function searchScene(scene){ // dono sources parallel — koi fail ho to scene survive kare
+  scene.errors=[]; scene.clips=[];
+  const jobs=[];
+  jobs.push(keys.pexels
+    ? searchPexels(scene.keywords,keys.pexels).then(r=>scene.clips.push(...r)).catch(e=>scene.errors.push('Pexels: '+e.message))
+    : Promise.resolve());
+  jobs.push(keys.pixabay
+    ? searchPixabay(scene.keywords,keys.pixabay).then(r=>scene.clips.push(...r)).catch(e=>scene.errors.push('Pixabay: '+e.message))
+    : Promise.resolve());
+  await Promise.all(jobs);
+  if(!keys.pexels&&!keys.pixabay) scene.errors.push('Pexels/Pixabay keys set nahi hain — neeche direct search links hain');
+}
+const srcLinks = q => `
+  <a target="_blank" rel="noopener" href="https://www.pexels.com/search/videos/${encodeURIComponent(q)}/">PEXELS ↗</a>
+  <a target="_blank" rel="noopener" href="https://pixabay.com/videos/search/${encodeURIComponent(q)}/">PIXABAY ↗</a>
+  <a target="_blank" rel="noopener" href="https://www.pinterest.com/search/videos/?q=${encodeURIComponent(q)}">PINTEREST ↗</a>`;
+
+/* ================= rendering ================= */
+const list=$('#sceneList');
+function frameEl(s,c,idx){
+  const picked=selections.get(s.sceneNumber)===c.id;
+  return `<figure class="frame${picked?' sel':''}" data-clip="${c.id}">
+    <div class="ph" data-preview="${escAttr(c.preview||'')}" title="${escAttr(c.page)}">
+      ${c.thumb?`<img src="${escAttr(c.thumb)}" alt="" loading="lazy">`:`<img src="" alt="" style="display:none">`}
+      <span class="dur">${fmtDur(c.duration)}</span>
+      ${picked?`<span class="picked-tag">${I('check',10)} SELECTED</span>`
+              :(idx===0?`<span class="rec">RECOMMENDED</span>`:'')}
+      <div class="acts">
+        <button class="abtn${picked?' on':''}" data-act="select" title="Select / deselect">${I(picked?'check':'circle',14)}</button>
+        <button class="abtn" data-act="copyurl" title="Clip URL copy karein">${I('link',14)}</button>
+        <button class="abtn" data-act="open" title="Source page kholein">${I('external',14)}</button>
+        <button class="abtn" data-act="download" title="Download">${I('download',14)}</button>
+      </div>
+    </div>
+    <figcaption class="cap"><span class="stamp">${c.source}</span><span>${esc(c.res||'')}</span></figcaption>
+  </figure>`;
+}
+function sceneEl(s,idx){
+  const pickedId=selections.get(s.sceneNumber);
+  const nP=s.clips.filter(c=>c.source==='PEXELS').length, nB=s.clips.filter(c=>c.source==='PIXABAY').length;
+  const art=document.createElement('article');
+  art.className='scene'; art.dataset.idx=idx;
+  art.innerHTML=`
+    <aside class="rail">
+      <span class="rlbl">SC.</span>
+      <span class="rnum">${pad(s.sceneNumber)}</span>
+      <span class="pick-mark"${pickedId?'':' hidden'}>PICKED</span>
+    </aside>
+    <div class="sbody">
+      <div class="shead">
+        <p class="scriptline">${esc(s.script)}</p>
+        ${s.visual?`<p class="vline">${I('target',12)}<em>${esc(s.visual)}</em></p>`:''}
+        <div class="krow">
+          <span class="klbl">SEARCH&nbsp;QUERY</span>
+          <input class="kw-input" value="${escAttr(s.keywords)}" spellcheck="false" aria-label="Search query — Enter dabain to dobara search ho">
+          <button class="ibtn" data-act="refresh" title="Is scene ke liye dobara search karein">${I('refresh',14)}</button>
+        </div>
+      </div>
+      <div class="stripwrap">
+        <div class="fs-prock top"></div>
+        ${s.status==='loading'
+          ?`<div class="strip loading"><span class="ldots">SEARCHING PEXELS / PIXABAY<span class="d">.</span><span class="d">.</span><span class="d">.</span></span></div>`
+          : s.clips.length
+            ?`<div class="strip">${s.clips.map((c,i)=>frameEl(s,c,i)).join('')}</div>`
+            :`<div class="strip empty"><p>${esc(s.errors.join(' — ')||'Is query ke liye koi clip nahi mili — query edit kar ke retry karein.')}</p><div class="nlinks">${srcLinks(s.keywords)}</div></div>`}
+        <div class="fs-prock bot"></div>
+      </div>
+      <div class="srcrow">
+        <span>PEXELS <b>${nP}</b> · PIXABAY <b>${nB}</b></span>
+        <a class="srclink" target="_blank" rel="noopener" href="https://www.pinterest.com/search/videos/?q=${encodeURIComponent(s.keywords)}">PINTEREST ${I('external',11)}</a>
+        ${s.errors.length?`<button class="retry" data-act="refresh">${I('refresh',11)} RETRY</button>`:''}
+      </div>
+    </div>`;
+  return art;
+}
+function renderAll(){
+  list.innerHTML='';
+  state.scenes.forEach((s,i)=>list.appendChild(sceneEl(s,i)));
+  updateCounts();
+}
+const findClip=(s,id)=>s.clips.find(c=>c.id===id);
+function updateCounts(){
+  const tot=state.scenes.reduce((a,s)=>a+s.clips.length,0);
+  $('#rmeta').innerHTML=`${pad(state.scenes.length)} SCENES · ${pad(tot)} CLIPS · <b>${pad(selections.size)} PICKED</b>`;
+  $('#trayCount').innerHTML=`<b>${pad(selections.size)}</b> CLIPS PICKED`;
+  const on=selections.size>0&&state.scenes.length>0;
+  $('#tray').classList.toggle('on',on);
+  document.body.classList.toggle('tray-on',on);
+}
+
+/* ================= interactions (event delegation) ================= */
+list.addEventListener('click', async e=>{
+  const act=e.target.closest('[data-act]');
+  const sc=e.target.closest('.scene');
+  if(sc){ // thumbnail par tap/click = preview toggle (touch ke liye bhi)
+    const ph=e.target.closest('.ph');
+    if(!act&&ph){
+      const v=ph._vid;
+      if(v){ v.paused?v.play().catch(()=>{}):v.pause(); }
+      return;
+    }
+  }
+  if(!act||!sc) return;
+  const idx=+sc.dataset.idx, s=state.scenes[idx], name=act.dataset.act;
+  const frame=act.closest('.frame'), clip=frame?findClip(s,frame.dataset.clip):null;
+
+  if(name==='refresh'){ reSearch(idx, sc.querySelector('.kw-input').value); }
+  else if(name==='select'&&clip){
+    const cur=selections.get(s.sceneNumber);
+    if(cur===clip.id) selections.delete(s.sceneNumber); else selections.set(s.sceneNumber, clip.id);
+    list.children[idx].replaceWith(sceneEl(s,idx));
+    updateCounts();
+  }
+  else if(name==='open'&&clip){ window.open(clip.page,'_blank','noopener'); }
+  else if(name==='copyurl'&&clip){
+    const url=clip.download||clip.page;
+    try{ await navigator.clipboard.writeText(url); toast('Clip URL copy ho gayi: '+url.slice(0,60)+'…'); }
+    catch(_){ window.open(url,'_blank','noopener'); }
+  }
+  else if(name==='download'&&clip){ downloadClip(clip,s); }
+});
+list.addEventListener('keydown', e=>{
+  if(e.key==='Enter'&&e.target.classList.contains('kw-input')){
+    e.preventDefault();
+    const sc=e.target.closest('.scene');
+    reSearch(+sc.dataset.idx, e.target.value);
+  }
+});
+/* hover par clip ka muted preview play ho */
+list.addEventListener('mouseover', e=>{ const ph=e.target.closest('.ph'); if(ph) startPreview(ph); });
+list.addEventListener('mouseout', e=>{ const ph=e.target.closest('.ph'); if(ph&&!ph.contains(e.relatedTarget)) stopPreview(ph); });
+function startPreview(ph){
+  const src=ph.dataset.preview;
+  if(!src||src==='null') return;
+  if(!ph._vid){
+    const v=document.createElement('video');
+    v.muted=true; v.loop=true; v.playsInline=true; v.preload='none';
+    v.src=src; ph.appendChild(v); ph._vid=v;
+  }
+  ph.classList.add('video-on');
+  ph._vid.play().catch(()=>{});
+}
+function stopPreview(ph){
+  ph.classList.remove('video-on');
+  if(ph._vid) ph._vid.pause();
+}
+async function reSearch(idx,q){
+  const s=state.scenes[idx];
+  s.keywords=cleanQuery(q)||s.keywords;
+  s.status='loading';
+  list.children[idx].replaceWith(sceneEl(s,idx));
+  await searchScene(s);
+  s.status='done';
+  list.children[idx].replaceWith(sceneEl(s,idx));
+  updateCounts();
+  toast(`SC.${pad(s.sceneNumber)} — ${s.clips.length} clips mile${s.errors.length?' (kuch errors hain)':''}`, s.errors.length?'warn':'ok');
+}
+
+/* ================= download (blob try, warna new tab fallback) ================= */
+async function downloadClip(clip,s){
+  toast('Download shuru ho gaya…');
+  try{
+    const r=await fetch(clip.download);
+    if(!r.ok) throw 0;
+    const b=await r.blob();
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(b);
+    a.download=`cutlist-sc${pad(s.sceneNumber)}-${clip.source.toLowerCase()}.mp4`;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+    toast('Clip download ho gayi');
+  }catch(_){
+    window.open(clip.download,'_blank','noopener');
+    toast('Browser ne direct download block kiya — video naye tab me khul gayi, wahan se save kar lein','warn');
+  }
+}
+
+/* ================= export ================= */
+function buildTextList(){
+  const L=['CUTLIST — SHOT LIST','Generated: '+new Date().toLocaleString(),''];
+  state.scenes.forEach(s=>{
+    const pickId=selections.get(s.sceneNumber);
+    const c=pickId?findClip(s,pickId):s.clips[0];
+    L.push(`SCENE ${pad(s.sceneNumber)}`,
+      `Script : ${s.script}`,
+      `Query  : ${s.keywords}`,
+      s.visual?`Visual : ${s.visual}`:null,
+      c?`Pick   : [${c.source}] ${c.page}${pickId?'':'  (auto-recommended)'}`:'Pick   : — koi clip nahi mili',
+      `Search : ${srcLinks(s.keywords).replace(/\s+/g,' ').trim()}`,'');
+  });
+  return L.filter(x=>x!==null).join('\n');
+}
+async function copyList(){
+  if(!state.scenes.length) return;
+  const txt=buildTextList();
+  try{ await navigator.clipboard.writeText(txt); toast('Shot list clipboard par copy ho gayi'); }
+  catch(_){
+    const t=document.createElement('textarea'); t.value=txt; document.body.appendChild(t);
+    t.select(); document.execCommand('copy'); t.remove();
+    toast('Shot list copy ho gayi');
+  }
+}
+function exportJson(){
+  if(!state.scenes.length) return;
+  const data={ tool:'CUTLIST', generated:new Date().toISOString(),
+    scenes: state.scenes.map(s=>({
+      sceneNumber:s.sceneNumber, script:s.script, keywords:s.keywords, visual:s.visual,
+      selected:(()=>{ const id=selections.get(s.sceneNumber); const c=id?findClip(s,id):null;
+        return c?{source:c.source,page:c.page,video:c.download}:null; })(),
+      clips:s.clips.map(c=>({source:c.source,page:c.page,preview:c.preview,video:c.download,duration:c.duration,res:c.res}))
+    })) };
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
+  a.download='cutlist-shotlist.json';
+  document.body.appendChild(a); a.click(); a.remove();
+  toast('Shot list .json file export ho gayi');
+}
+
+/* ================= main pipeline ================= */
+const scriptEl=$('#scriptInput'), btnGo=$('#btnGo');
+let busy=false;
+async function runPipeline(){
+  if(busy) return;
+  const script=scriptEl.value.trim();
+  if(wordCount(script)<8){ toast('Script bohat chhoti hai — thora tafseel ke sath paste karein','warn'); scriptEl.focus(); return; }
+  if(!keys.gemini){
+    $('#keyPanel').classList.remove('hidden'); kGemini.focus();
+    toast('Pehle apni Gemini API key add karein (API KEYS)','warn');
+    return;
+  }
+  busy=true; btnGo.disabled=true; btnGo.firstChild.textContent='ROLLING… ';
+  startOverlay(); setStep(2);
+  try{
+    log(`SCRIPT RECEIVED — ${wordCount(script)} words`);
+    log('GEMINI 2.0 FLASH — script breakdown chal raha hai…');
+    state.scenes=await geminiBreakdown(script);
+    log(`${state.scenes.length} scenes identify ho gaye`,'ok');
+    setStep(3);
+    log('Clip sources search ho rahi hain (Pexels / Pixabay)…');
+    for(let i=0;i<state.scenes.length;i+=3){ // rate limits ke liye batches of 3
+      const batch=state.scenes.slice(i,i+3);
+      await Promise.all(batch.map(async s=>{
+        await searchScene(s);
+        log(`SC.${pad(s.sceneNumber)} → "${s.keywords}" → ${s.clips.length} clips${s.errors.length?' (kuch errors)':''}`, s.errors.length?'err':'ok');
+      }));
+    }
+    selections.clear();
+    renderAll(); setStep(4);
+    $('#stageResults').classList.remove('hidden');
+    log('BREAKDOWN COMPLETE — sheet tayyar hai','ok');
+    endOverlay(600);
+    setTimeout(()=>{
+      $('#stageResults').scrollIntoView({behavior:'smooth'});
+      toast(`${state.scenes.length} scenes breakdown ho gaye — clips select karein`);
+    },650);
+  }catch(err){
+    log(String(err.message||err),'err');
+    endOverlay(1500);
+    setTimeout(()=>toast('Analysis fail: '+(err.message||err),'warn'),1550);
+  }finally{
+    busy=false; btnGo.disabled=false; btnGo.firstChild.textContent='BREAK DOWN SCRIPT ';
+  }
+}
+
+/* ================= bindings ================= */
+const kGemini=$('#kGemini'), kPexels=$('#kPexels'), kPixabay=$('#kPixabay');
+[kGemini,kPexels,kPixabay].forEach(el=>{
+  el.addEventListener('input',saveKeys);
+  el.addEventListener('dblclick',()=>{ el.type=el.type==='password'?'text':'password'; });
+});
+ $('#keyBtn').addEventListener('click',()=>$('#keyPanel').classList.toggle('hidden'));
+ $('#btnSample').addEventListener('click',()=>{
+  scriptEl.value=SAMPLE; scriptEl.dispatchEvent(new Event('input'));
+  toast('Sample script load ho gayi — ab BREAK DOWN SCRIPT dabain');
+});
+btnGo.addEventListener('click',runPipeline);
+scriptEl.addEventListener('input',()=>{
+  localStorage.setItem('cutlist.script',scriptEl.value);
+  $('#wcount').innerHTML=`<b>${wordCount(scriptEl.value)}</b> WORDS · <b>${scriptEl.value?scriptEl.value.split('\n').length:0}</b> LINES · AUTOSAVED`;
+});
+scriptEl.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key==='Enter') runPipeline(); });
+ $('#btnCopy').addEventListener('click',copyList);
+ $('#trayCopy').addEventListener('click',copyList);
+ $('#btnExport').addEventListener('click',exportJson);
+ $('#trayExport').addEventListener('click',exportJson);
+ $('#trayClear').addEventListener('click',()=>{
+  selections.clear(); renderAll();
+  toast('Picks clear ho gaye');
+});
+
+/* init */
+loadKeys();
+scriptEl.value=localStorage.getItem('cutlist.script')||'';
+scriptEl.dispatchEvent(new Event('input'));
+setStep(1);
+</script>
+</body>
+</html>
