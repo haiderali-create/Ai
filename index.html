@@ -9,7 +9,6 @@
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,700;1,9..144,500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js" defer></script>
 <style>
-/* ============ CUTLIST — shooting-script aesthetic ============ */
 :root{
   --paper:#F2EDE3; --paper-2:#FBF8F1; --ink:#191713; --ink-2:#6E675B;
   --red:#C63A21; --red-dk:#A02D18; --film:#0E0D0C;
@@ -24,7 +23,6 @@ body.tray-on{padding-bottom:76px}
 button{font-family:var(--ui)}
 a{color:inherit}
 
-/* halka film-grain */
 body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;opacity:.45;mix-blend-mode:multiply;
   background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.10 0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0.35 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");}
 
@@ -86,7 +84,7 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
 .keys-status{margin-top:14px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;
   font:700 11px var(--mono);letter-spacing:.04em;color:var(--ink-2)}
 
-/* ============ Workflow steps ============ */
+/* ============ Workflow steps + format switch ============ */
 .steps{display:flex;align-items:center;gap:14px;margin:26px 0 30px;flex-wrap:wrap}
 .step{display:flex;align-items:center;gap:9px;font:600 10.5px var(--ui);letter-spacing:.16em;color:var(--ink-2)}
 .step .no{font:700 12px var(--mono);border:1px solid currentColor;width:25px;height:25px;display:grid;place-items:center;flex:none}
@@ -94,6 +92,13 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
 .step.done{color:var(--ink)}
 .step.done .no{background:var(--ink);color:var(--paper);border-color:var(--ink)}
 .srule{flex:1;min-width:16px;height:1px;background:rgba(25,23,19,.25)}
+.fmtctl{display:flex;align-items:center;gap:10px}
+.flbl{font:600 9.5px var(--ui);letter-spacing:.22em;color:var(--ink-2)}
+.fmt{display:inline-flex;border:1px solid var(--ink);background:var(--paper-2)}
+.fbtn{font:700 10px var(--ui);letter-spacing:.12em;padding:9px 13px;background:transparent;border:0;cursor:pointer;color:var(--ink);transition:.15s}
+.fbtn+.fbtn{border-left:1px solid var(--ink)}
+.fbtn.on{background:var(--red);color:var(--paper)}
+.fbtn:not(.on):hover{color:var(--red)}
 
 /* ============ Script sheet ============ */
 .sheet{position:relative;background:var(--paper-2);border:1px solid var(--ink);box-shadow:8px 8px 0 rgba(25,23,19,.12)}
@@ -129,13 +134,18 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
   color:var(--ink);padding:7px 11px;cursor:pointer;transition:.15s}
 .qchip:hover{border-style:solid;border-color:var(--red);color:var(--red);background:rgba(198,58,33,.06)}
 
-/* ============ Results header ============ */
+/* ============ Results header + niche strip ============ */
 .rhead{display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;
-  border-bottom:2px solid var(--ink);padding:10px 0 18px;margin-bottom:26px}
+  border-bottom:2px solid var(--ink);padding:10px 0 18px;margin-bottom:22px}
 .rhead h2{font:700 clamp(30px,4.5vw,44px)/1 var(--disp)}
 .rmeta{font:12px var(--mono);letter-spacing:.08em;color:var(--ink-2);margin-top:9px}
 .rmeta b{color:var(--red);font-weight:700}
 .racts{display:flex;gap:10px;flex-wrap:wrap}
+.nichestrip{display:flex;gap:14px;align-items:center;flex-wrap:wrap;border:1px dashed var(--ink);background:var(--paper-2);
+  padding:12px 16px;margin-bottom:24px;font:12px var(--mono);letter-spacing:.04em;color:var(--ink-2)}
+.nichestrip b{color:var(--ink);font-weight:700}
+.nichestrip .ntag{background:var(--ink);color:var(--paper);font:700 9px var(--ui);letter-spacing:.2em;padding:4px 8px;flex:none}
+.nichestrip .nnotes{font-style:italic}
 
 /* ============ Scene breakdown sheet ============ */
 .scene{display:grid;grid-template-columns:96px 1fr;border:1px solid var(--ink);background:var(--paper-2);
@@ -285,6 +295,7 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
   .racts{width:100%}
   .modetabs{width:100%}
   .mtab{flex:1;justify-content:center}
+  .fmtctl{width:100%;justify-content:flex-end}
 }
 </style>
 </head>
@@ -315,7 +326,7 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
   <div id="keyPanel" class="keypanel hidden">
     <div class="kp-grid">
       <label class="wide">GEMINI KEYS (AI STUDIO) — BULK, HAR LINE PAR EK KEY — JITNI CHAHEN
-        <textarea id="kKeys" rows="4" spellcheck="false" autocomplete="off" placeholder="AIzaSy...key1&#10;AIzaSy...key2&#10;AIzaSy...key3&#10;(jitni keys hain, utni lines — fail hone par tool khud agli key par jump karega)"></textarea>
+        <textarea id="kKeys" rows="4" spellcheck="false" autocomplete="off" placeholder="AIzaSy...key1&#10;AIzaSy...key2&#10;AIzaSy...key3&#10;(fail hone par tool khud agli key par jump karega)"></textarea>
       </label>
       <label>PEXELS — OPTIONAL<input type="password" id="kPexels" placeholder="pexels.com/api se free key" autocomplete="off"></label>
       <label>PIXABAY — OPTIONAL<input type="password" id="kPixabay" placeholder="pixabay.com/api/docs se free key" autocomplete="off"></label>
@@ -323,23 +334,31 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
     </div>
     <div class="keys-status" id="keysStatus"></div>
     <p class="kp-note">
-      <b>Gemini key rotation:</b> request pehli key se shuru — key fail ho (quota / rate limit / busy / invalid) to
-      <b>khud agli key</b> par jump… sab fail to poori list dobara (2 rounds). Keys sirf aapke browser me rehti hain.
-      Gemini key <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio</a> se,
+      <b>Gemini key rotation:</b> key fail ho to khud agli key par jump… sab fail to poori list dobara (2 rounds).
+      Gemini key <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">AI Studio</a> se,
       Pexels <a href="https://www.pexels.com/api/" target="_blank" rel="noopener">pexels.com/api</a> se,
       Pixabay <a href="https://pixabay.com/api/docs/" target="_blank" rel="noopener">pixabay.com/api/docs</a> se free.
-      <b>Clip chain:</b> PEXELS → PIXABAY → WIKIMEDIA (keyless) → ARCHIVE (keyless) — jo fail, agli.
-      <b>TOPIC MODE:</b> sirf topic likhein (jaise "real animal rescue") — AI 10 visual angles banata hai aur har angle par clips dhoondhta hai.
+      <b>Clip chain:</b> PEXELS → PIXABAY → WIKIMEDIA (keyless) → ARCHIVE (keyless).
+      <b>OUTPUT FORMAT:</b> SHORT CLIPS = chhoti b-roll · FULL VIDEOS = lambi continuous footage (search + AI prompts dono badalte hain).
+      <b>HISTORY:</b> jo clip RECOMMEND ho chuki wo save hoti hai — dobara recommend nahi hoti (tray se reset ho sakti hai).
+      <b>TOPIC MODE:</b> pehle NICHE analyze hota hai, phir 10 angles, phir clips.
     </p>
   </div>
 </section>
 
-<!-- Workflow steps -->
+<!-- Workflow steps + OUTPUT FORMAT switch -->
 <nav class="wrap steps" aria-label="Workflow">
   <div class="step on" id="st1"><span class="no">01</span><span id="st1lbl">SCRIPT</span></div><span class="srule"></span>
   <div class="step" id="st2"><span class="no">02</span>AI ANALYSIS</div><span class="srule"></span>
   <div class="step" id="st3"><span class="no">03</span>CLIP SOURCING</div><span class="srule"></span>
   <div class="step" id="st4"><span class="no">04</span>PICK &amp; EXPORT</div>
+  <div class="fmtctl" title="Videos aur clips alag cheezein hain — pehle choose karein kya nikalna hai">
+    <span class="flbl">OUTPUT:</span>
+    <div class="fmt" role="group" aria-label="Output format">
+      <button class="fbtn on" data-fmt="clips">SHORT CLIPS</button>
+      <button class="fbtn" data-fmt="videos">FULL VIDEOS</button>
+    </div>
+  </div>
 </nav>
 
 <main class="wrap">
@@ -347,7 +366,6 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
   <!-- STAGE 1: input -->
   <section id="stageInput">
 
-    <!-- mode tabs -->
     <div class="modetabs" role="tablist">
       <button class="mtab on" data-mode="script" role="tab"><span class="no">A</span>SCRIPT → SCENES</button>
       <button class="mtab" data-mode="topic" role="tab"><span class="no">B</span>TOPIC → CLIPS</button>
@@ -358,13 +376,13 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
       <div class="sheet">
         <div class="sheethead"><span>VIDEO SCRIPT</span><span class="pg">PG. 01 · REV. A</span></div>
         <div class="margin-line"></div>
-        <textarea id="scriptInput" spellcheck="false" placeholder="Apni complete video script yahan paste karein — English ya koi bhi zubaan.&#10;&#10;AI har scene, sentence aur visual keyword khud identify karega, phir Pexels / Pixabay / Wikimedia / Archive se matching clips dhoondh dega."></textarea>
+        <textarea id="scriptInput" spellcheck="false" placeholder="Apni complete video script yahan paste karein — English ya koi bhi zubaan.&#10;&#10;AI har scene identify karega, phir Pexels / Pixabay / Wikimedia / Archive se matching clips dhoondh dega."></textarea>
       </div>
       <div class="wcount" id="wcount"><b>0</b> WORDS · <b>0</b> LINES · AUTOSAVED</div>
       <div class="actionbar">
         <div class="alinks">
           <button class="sample-link" id="btnSample">SAMPLE SCRIPT LOAD KAREIN</button>
-          <p class="hint"><b>Gemini keys bulk mein</b> lagayen (API KEYS → har line par ek) — jo key fail ho, tool khud agli par chala jayega. Breakdown ke baad <b>ek click ZIP download</b>.</p>
+          <p class="hint"><b>OUTPUT FORMAT</b> upar choose karein — SHORT CLIPS (b-roll) ya FULL VIDEOS (lambi footage). Jo clip recommend ho chuki wo history mein save hai — agli dafa fresh recommend hogi. Har fetch ka time log mein live dikhta hai.</p>
         </div>
         <button class="btn big" id="btnGo">BREAK DOWN SCRIPT <span class="ic" data-icon="arrow"></span></button>
       </div>
@@ -373,7 +391,7 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
     <!-- PANE B: topic -->
     <div id="paneTopic" class="hidden">
       <div class="sheet">
-        <div class="sheethead"><span>TOPIC / NICHE</span><span class="pg">ANGLE RESEARCH</span></div>
+        <div class="sheethead"><span>TOPIC / NICHE</span><span class="pg">NICHE ANALYSIS → ANGLES</span></div>
         <div class="topicbody">
           <span class="tlabel2">JIS TOPIC KE VIDEOS CHAHIVEN, WO LIKHEIN</span>
           <input id="topicInput" spellcheck="false" autocomplete="off" placeholder="misal:  real animal rescue">
@@ -385,12 +403,12 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
             <button class="qchip" data-topic="heavy rain flooded street storm">RAIN / STORM</button>
             <button class="qchip" data-topic="farmer working field tractor village">FARM / VILLAGE</button>
           </div>
-          <p class="hint"><b>Kaise chalta hai:</b> AI aapke topic ke <b>10 alag visual angles</b> sochta hai (main action, close-up, location, log, equipment, aftermath…) — har angle ki English search query banata hai, phir chaaron clip APIs se us angle ke clips nikal kar ek breakdown sheet bana deta hai.</p>
+          <p class="hint"><b>Kaise chalta hai:</b> AI <b>pehle aapka NICHE analyze</b> karta hai (kya hai, kaisi footage milti hai, kya style) — phir us samajh ke sath <b>10 visual angles</b> banata hai, phir chaaron APIs se clips nikalta hai. Niche breakdown sheet ke upar strip mein nazar aayega.</p>
         </div>
       </div>
       <div class="actionbar">
         <div class="alinks">
-          <p class="hint">Topic jitna waazeh ho, clips utni relevant — "real" ya "documentary" likhne se AI real-life footage wali queries banata hai.</p>
+          <p class="hint">Pehle upar <b>OUTPUT FORMAT</b> choose karein — clips ya videos. Phir FIND CLIPS dabayen.</p>
         </div>
         <button class="btn big" id="btnGoTopic">FIND CLIPS <span class="ic" data-icon="arrow"></span></button>
       </div>
@@ -407,12 +425,13 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
       </div>
       <div class="racts">
         <button class="btn solid-red" id="btnZipAll" title="Jo clips mili hain SAB — ek zip file me"><span class="ic" data-icon="download"></span><span class="lbl">ZIP — ALL CLIPS</span></button>
-        <button class="btn ghost" id="btnZipPicks" title="Selected clips (ya recommended) — ek zip me"><span class="ic" data-icon="download"></span><span class="lbl">ZIP — PICKS</span></button>
+        <button class="btn ghost" id="btnZipPicks" title="Selected clips (ya fresh recommended) — ek zip me"><span class="ic" data-icon="download"></span><span class="lbl">ZIP — PICKS</span></button>
         <button class="btn ghost" id="btnCopy"><span class="ic" data-icon="clipboard"></span>COPY LIST</button>
         <button class="btn ghost" id="btnExport"><span class="ic" data-icon="file"></span>EXPORT .JSON</button>
         <a class="btn ghost" href="#stageInput" id="btnNew">NEW</a>
       </div>
     </div>
+    <div id="nicheStrip" class="nichestrip hidden"></div>
     <div id="sceneList"></div>
   </section>
 
@@ -442,9 +461,10 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
   <span class="tlabel">BIN</span>
   <span class="tcount" id="trayCount"><b>00</b> CLIPS PICKED</span>
   <span class="tsep"></span>
-  <button class="tbtn hot" id="trayZip" title="Selected clips (ya recommended) — ek ZIP me download"><span class="ic" data-icon="download"></span><span class="lbl">ZIP PICKS</span></button>
+  <button class="tbtn hot" id="trayZip" title="Selected clips (ya fresh recommended) — ek ZIP me"><span class="ic" data-icon="download"></span><span class="lbl">ZIP PICKS</span></button>
   <button class="tbtn" id="trayCopy"><span class="ic" data-icon="clipboard"></span>COPY LIST</button>
   <button class="tbtn" id="trayExport"><span class="ic" data-icon="file"></span>EXPORT .JSON</button>
+  <button class="tbtn" id="trayHist" title="Recommendation history reset — purani clips phir recommend ho sakti hain"><span class="ic" data-icon="refresh"></span>RESET HISTORY</button>
   <button class="tbtn" id="trayClear"><span class="ic" data-icon="trash"></span>CLEAR</button>
 </footer>
 
@@ -478,10 +498,15 @@ const I = (n,s=15) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill=
 document.querySelectorAll('[data-icon]').forEach(el => el.innerHTML = I(el.dataset.icon, el.dataset.size||15));
 
 /* ================= state & keys ================= */
-const state = { scenes: [] };
+const state = { scenes:[], fmt:'clips', niche:null };
 const selections = new Map();
 const keys = { geminiKeys:[], pexels:'', pixabay:'', model:'' };
 let mode='script';
+
+/* recommendation history — jo recommend ho chuki, dobara nahi */
+let history = new Set();
+function loadHistory(){ try{ history=new Set(JSON.parse(localStorage.getItem('cutlist.history')||'[]')); }catch(_){ history=new Set(); } }
+function saveHistory(){ const arr=[...history]; localStorage.setItem('cutlist.history',JSON.stringify(arr.slice(-3000))); if(arr.length>3000) history=new Set(arr.slice(-3000)); }
 
 const kKeys=$('#kKeys'), kPexels=$('#kPexels'), kPixabay=$('#kPixabay'), kModel=$('#kModel');
 const scriptEl=$('#scriptInput'), topicEl=$('#topicInput');
@@ -542,6 +567,17 @@ function setMode(m){
 }
 document.querySelectorAll('.mtab').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
 
+/* ================= OUTPUT FORMAT (clips vs videos) ================= */
+function setFmt(f, announce){
+  state.fmt = f==='videos' ? 'videos' : 'clips';
+  localStorage.setItem('cutlist.fmt', state.fmt);
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.toggle('on', b.dataset.fmt===state.fmt));
+  if(announce) toast(state.fmt==='videos'
+    ? 'FULL VIDEOS mode — ab lambi continuous footage priority milegi (documentary/full scenes)'
+    : 'SHORT CLIPS mode — ab chhoti b-roll clips priority milegi');
+}
+document.querySelectorAll('.fbtn').forEach(b=>b.addEventListener('click',()=>setFmt(b.dataset.fmt,true)));
+
 /* ================= toast ================= */
 function toast(msg, kind='ok'){
   const t=document.createElement('div');
@@ -590,6 +626,10 @@ Montage: hands sketching ideas, a printer spitting out pages, notes pinned to a 
 Finally, he closes the laptop, steps outside into the sunlight, and smiles for the first time.`;
 
 /* ================= AI prompts ================= */
+const fmtHint = () => state.fmt==='videos'
+  ? 'The user wants FULL/longer videos: prefer queries that surface longer continuous real footage (full scenes, documentaries, extended shots).'
+  : 'The user wants SHORT b-roll clips: prefer short punchy individual shots.';
+
 function buildPrompt(script){
   return `You are a senior video editor preparing a shot list. Analyze the script below and split it into scenes for sourcing stock B-roll footage.
 
@@ -598,6 +638,7 @@ RULES:
 - "script": the exact original sentence(s) from the script for that scene (keep the original language).
 - "keywords": ONE short English stock-footage search query, 2-5 words, visually concrete (objects, actions, places). No abstract words like "feeling", "hope" or "success".
 - "visual": one short sentence describing the needed shot, in the same language as the script.
+- ${fmtHint()}
 
 Respond with JSON only, exactly this shape:
 {"scenes":[{"sceneNumber":1,"script":"...","keywords":"man walking rainy street night","visual":"..."}]}
@@ -608,17 +649,21 @@ SCRIPT:
 """`;
 }
 function buildTopicPrompt(topic){
-  return `You are a stock-footage researcher. I will give you a TOPIC. Produce a set of diverse, VISUALLY CONCRETE search queries for finding real video footage about this topic.
+  return `You are a stock-footage researcher. Work in TWO stages:
+
+STAGE 1 — NICHE ANALYSIS: Identify what niche/topic this is, what category it belongs to, what style of real footage exists for it, and one line of notes.
+
+STAGE 2 — QUERIES: Produce exactly 10 diverse, VISUALLY CONCRETE English search queries for finding real video footage about this niche.
 
 RULES:
-- Exactly 10 queries (sceneNumber 1-10).
-- Each "keywords": short English search query, 2-5 words, concrete visual subject (animals, people, objects, actions, places). If the topic includes words like "real" or "documentary", keep that real-life phrasing — prefer raw/documentary style queries over cinematic fiction.
-- Cover DIFFERENT angles across the set: main action, close-up detail, wide location shot, the people involved, equipment/tools being used, emotional moment, result/aftermath, environment/habitat.
+- Each "keywords": short English search query, 2-5 words, concrete visual subject (animals, people, objects, actions, places). If the topic includes words like "real" or "documentary", keep that real-life phrasing.
+- Cover DIFFERENT angles across the set: main action, close-up detail, wide location shot, the people involved, equipment/tools, emotional moment, result/aftermath, environment/habitat.
 - Each "visual": one short English sentence describing that shot.
 - No abstract words like "hope", "feeling", "success".
+- ${fmtHint()}
 
 Respond with JSON only, exactly this shape:
-{"scenes":[{"sceneNumber":1,"keywords":"rescuers pulling dog from flood water","visual":"Rescue workers wading through floodwater carrying a dog to safety"}]}
+{"niche":{"name":"...","category":"...","style":"real documentary footage","notes":"..."},"scenes":[{"sceneNumber":1,"keywords":"...","visual":"..."}]}
 
 TOPIC:
 """
@@ -723,39 +768,45 @@ async function geminiWithRetry(prompt){
   }
   throw lastErr || new Error('Gemini fail — sab keys try ho gayin');
 }
-function parseScenesJSON(data, fallbackSeed){
+function parseScenesJSON(data){
   let txt=(data?.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();
   txt=txt.replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
   let parsed;
   try{ parsed=JSON.parse(txt); }catch(e){ throw new Error('AI ka JSON parse nahi hua — dobara try karein'); }
+  const niche=(parsed && typeof parsed==='object' && parsed.niche && typeof parsed.niche==='object')?parsed.niche:null;
   const arr=Array.isArray(parsed)?parsed:parsed.scenes;
   if(!Array.isArray(arr)||!arr.length) throw new Error('AI ne koi scene return nahi ki');
-  return arr;
+  return { arr, niche };
 }
 async function geminiScriptBreakdown(script){
   log(`${keys.geminiKeys.length} Gemini keys loaded — rotation ON (fail → agli key)`);
-  const data=await geminiWithRetry(buildPrompt(script));
-  const arr=parseScenesJSON(data);
+  log('GEMINI — script scenes analyze ho rahe hain…');
+  const { arr } = await geminiWithRetry(buildPrompt(script));
+  state.niche=null;
   return arr.slice(0,12).map((s,i)=>({
     sceneNumber: +s.sceneNumber||i+1,
     script: String(s.script||'').trim(),
     keywords: cleanQuery(s.keywords) || fallbackQuery(s.script),
     visual: String(s.visual||'').trim(),
-    status:'done', clips:[], errors:[], statusLog:[]
+    status:'done', clips:[], errors:[], statusLog:[], recId:null
   }));
 }
-/* TOPIC MODE — topic se 10 diverse queries */
+/* TOPIC MODE — pehle NICHE analyze, phir angles */
 async function geminiTopicBreakdown(topic){
   log(`${keys.geminiKeys.length} Gemini keys loaded — rotation ON (fail → agli key)`);
-  log(`TOPIC RESEARCH — "${topic}" ke 10 visual angles dhoondh raha hai…`);
-  const data=await geminiWithRetry(buildTopicPrompt(topic));
-  const arr=parseScenesJSON(data, topic);
+  log(`NICHE ANALYSIS — "${topic}" ko AI pehle samajh raha hai…`);
+  const { arr, niche } = await geminiWithRetry(buildTopicPrompt(topic));
+  state.niche = niche || { name:topic, category:'', style:'', notes:'' };
+  log(`NICHE DETECTED: "${state.niche.name||topic}"${state.niche.style?(' — '+state.niche.style):''}`,'ok');
+  if(state.niche.notes) log('NICHE NOTES: '+state.niche.notes);
+  log(`Ab isi niche ke ${Math.min(arr.length,10)} visual angles par clips dhoondhe jayengi…`);
+  try{ localStorage.setItem('cutlist.niche', JSON.stringify({topic:topic.toLowerCase(), niche:state.niche})); }catch(_){}
   return arr.slice(0,12).map((s,i)=>({
     sceneNumber: +s.sceneNumber||i+1,
     script: String(s.visual||s.keywords||topic).trim(),
     keywords: cleanQuery(s.keywords) || fallbackQuery(topic),
     visual:'',
-    status:'done', clips:[], errors:[], statusLog:[]
+    status:'done', clips:[], errors:[], statusLog:[], recId:null
   }));
 }
 
@@ -783,11 +834,25 @@ function httpErr(status){
 }
 const parseLen = l => !l ? 0 : (String(l).includes(':') ? String(l).split(':').reduce((a,b)=>a*60+(+b||0),0) : Math.round(+l)||0);
 
+/* format filter — SHORT CLIPS vs FULL VIDEOS */
+function applyFmt(list){
+  const v = state.fmt==='videos';
+  let out = list;
+  if(v){
+    const f = list.filter(c=>!c.duration || c.duration>=45);
+    out = (f.length?f:list).slice().sort((a,b)=>(b.duration||0)-(a.duration||0));
+  }else{
+    const f = list.filter(c=>!c.duration || c.duration<=300);
+    out = f.length?f:list;
+  }
+  return out.slice(0,5);
+}
+
 async function searchPexels(q,key){
-  const r=await jfetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(q)}&per_page=4&orientation=landscape`,{headers:{Authorization:key}});
+  const r=await jfetch(`https://api.pexels.com/videos/search?query=${encodeURIComponent(q)}&per_page=8&orientation=landscape`,{headers:{Authorization:key}});
   if(!r.ok) throw httpErr(r.status);
   const d=await r.json();
-  return (d.videos||[]).map(v=>{
+  const raw=(d.videos||[]).map(v=>{
     const files=(v.video_files||[]).filter(f=>f.file_type==='video/mp4'&&f.width);
     const asc=[...files].sort((a,b)=>a.width-b.width);
     const desc=[...files].sort((a,b)=>b.width-a.width);
@@ -796,12 +861,13 @@ async function searchPexels(q,key){
     return { id:'px'+v.id, source:'PEXELS', page:v.url, thumb:v.image, preview,
       download:best.link, duration:v.duration, res:best.width?`${best.width}×${best.height}`:'' };
   });
+  return applyFmt(raw);
 }
 async function searchPixabay(q,key){
-  const r=await jfetch(`https://pixabay.com/api/videos/?key=${encodeURIComponent(key)}&q=${encodeURIComponent(q)}&per_page=4&safesearch=true`);
+  const r=await jfetch(`https://pixabay.com/api/videos/?key=${encodeURIComponent(key)}&q=${encodeURIComponent(q)}&per_page=8&safesearch=true`);
   if(!r.ok) throw httpErr(r.status);
   const d=await r.json();
-  return (d.hits||[]).map(h=>{
+  const raw=(d.hits||[]).map(h=>{
     const V=h.videos||{};
     const size=V.large||V.medium||V.small||V.tiny||{};
     const prev=(V.tiny||V.small||V.medium||size).url;
@@ -811,16 +877,17 @@ async function searchPixabay(q,key){
       preview:prev, download:size.url, duration:h.duration,
       res:size.width?`${size.width}×${size.height}`:'' };
   });
+  return applyFmt(raw);
 }
 async function searchWikimedia(q){
   const u='https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*'
     +'&generator=search&gsrsearch='+encodeURIComponent('filetype:video '+q)
-    +'&gsrnamespace=6&gsrlimit=6&prop=imageinfo&iiprop=url|size|mime&iiurlwidth=560';
+    +'&gsrnamespace=6&gsrlimit=8&prop=imageinfo&iiprop=url|size|mime|dimensions&iiurlwidth=560';
   const r=await jfetch(u);
   if(!r.ok) throw httpErr(r.status);
   const d=await r.json();
   const pages=Object.values(d?.query?.pages||{});
-  return pages.map(p=>{
+  const raw=pages.map(p=>{
     const ii=(p.imageinfo||[])[0];
     if(!ii) return null;
     if(ii.mime && !/webm|mp4|ogg|video/i.test(ii.mime)) return null;
@@ -829,10 +896,13 @@ async function searchWikimedia(q){
       thumb:ii.thumburl||'', preview:ii.url, download:ii.url,
       duration:ii.duration||0, res:ii.width?`${ii.width}×${ii.height}`:'' };
   }).filter(Boolean);
+  return applyFmt(raw);
 }
 async function searchArchive(q){
+  const videos = state.fmt==='videos';
+  const rows = videos?5:3;
   const u='https://archive.org/advancedsearch.php?q='+encodeURIComponent(q+' AND mediatype:(movies)')
-    +'&fl%5B%5D=identifier&fl%5B%5D=title&rows=3&page=1&output=json';
+    +'&fl%5B%5D=identifier&fl%5B%5D=title&rows='+rows+'&page=1&output=json';
   const r=await jfetch(u);
   if(!r.ok) throw httpErr(r.status);
   const d=await r.json();
@@ -840,8 +910,13 @@ async function searchArchive(q){
   const metas=await Promise.all(docs.map(async doc=>{
     try{
       const m=await (await jfetch(`https://archive.org/metadata/${doc.identifier}`,{},7000)).json();
-      const files=(m?.files||[]).filter(f=>/\.mp4$/i.test(f.name||''));
-      const f=files.find(x=>{const L=parseLen(x.length); return L>0&&L<=600;})||files[0];
+      const files=[...(m?.files||[])].filter(f=>/\.mp4$/i.test(f.name||''));
+      let f;
+      if(videos){
+        f=[...files].sort((a,b)=>parseLen(b.length)-parseLen(a.length)).find(x=>parseLen(x.length)<=2700)||files[0];
+      }else{
+        f=files.find(x=>{const L=parseLen(x.length); return L>0&&L<=600;})||files[0];
+      }
       if(!f) return null;
       return { id:'ia'+doc.identifier, source:'ARCHIVE',
         page:'https://archive.org/details/'+doc.identifier,
@@ -851,7 +926,7 @@ async function searchArchive(q){
         duration:parseLen(f.length), res:f.width?`${f.width}×${f.height}`:'' };
     }catch(_){ return null; }
   }));
-  return metas.filter(Boolean);
+  return applyFmt(metas.filter(Boolean));
 }
 
 const SOURCES=[
@@ -864,31 +939,41 @@ const enabledSources=()=>SOURCES.filter(s=>!s.needsKey||keys[s.needsKey]);
 
 async function trySource(src,q){
   for(let attempt=1;attempt<=2;attempt++){
+    const st=performance.now();
     try{
       const clips=await src.fn(q, src.needsKey?keys[src.needsKey]:undefined);
-      return { ok:true, clips:clips||[], err:null };
+      return { ok:true, clips:clips||[], err:null, ms:(performance.now()-st)/1000 };
     }catch(e){
       const transient = e.transient || /timeout|network/i.test(e.message||'');
       if(attempt===1&&transient){ await sleep(1400); continue; }
-      return { ok:false, clips:[], err:e.message||'fail' };
+      return { ok:false, clips:[], err:e.message||'fail', ms:(performance.now()-st)/1000 };
     }
   }
 }
-async function searchScene(scene){
+/* poori chain — har source try, timing record, phir FRESH recommended clip (history se) */
+async function searchScene(scene, onSrc){
   scene.errors=[]; scene.clips=[]; scene.statusLog=[];
   const chain=enabledSources();
   for(const src of chain){
+    onSrc && onSrc(src.name,'start');
     const r=await trySource(src, scene.keywords);
+    const msTxt=r.ms.toFixed(1)+'s';
+    let entry;
     if(r.ok&&r.clips.length){
       scene.clips.push(...r.clips);
-      scene.statusLog.push({name:src.name, ok:true, msg:r.clips.length+' clips'});
+      entry={name:src.name, ok:true, msg:r.clips.length+' clips · '+msTxt, ms:r.ms};
     }else if(r.ok){
-      scene.statusLog.push({name:src.name, ok:false, msg:'0 results'});
+      entry={name:src.name, ok:false, msg:'0 results · '+msTxt, ms:r.ms};
     }else{
-      scene.statusLog.push({name:src.name, ok:false, msg:r.err});
+      entry={name:src.name, ok:false, msg:r.err+' · '+msTxt, ms:r.ms};
       scene.errors.push(src.name+': '+r.err);
     }
+    scene.statusLog.push(entry);
+    onSrc && onSrc(src.name,'end',entry);
   }
+  /* history-aware recommendation — jo pehle recommend ho chuki wo dobara nahi */
+  const unseen = scene.clips.find(c=>!history.has(c.id));
+  scene.recId = (unseen || scene.clips[0] || {}).id || null;
 }
 const srcLinks = q => `
   <a target="_blank" rel="noopener" href="https://www.pexels.com/search/videos/${encodeURIComponent(q)}/">PEXELS ↗</a>
@@ -897,14 +982,19 @@ const srcLinks = q => `
 
 /* ================= rendering ================= */
 const list=$('#sceneList');
-function frameEl(s,c,idx){
+const getPick = s => {
+  const id=selections.get(s.sceneNumber);
+  return (id && findClip(s,id)) || s.clips.find(c=>c.id===s.recId) || s.clips[0] || null;
+};
+function frameEl(s,c){
   const picked=selections.get(s.sceneNumber)===c.id;
+  const isRec=c.id===s.recId;
   return `<figure class="frame${picked?' sel':''}" data-clip="${c.id}">
     <div class="ph" data-preview="${escAttr(c.preview||'')}" title="${escAttr(c.page)}">
       ${c.thumb?`<img src="${escAttr(c.thumb)}" alt="" loading="lazy">`:`<img src="" alt="" style="display:none">`}
       <span class="dur">${fmtDur(c.duration)}</span>
       ${picked?`<span class="picked-tag">${I('check',10)} SELECTED</span>`
-              :(idx===0?`<span class="rec">RECOMMENDED</span>`:'')}
+              :(isRec?`<span class="rec">RECOMMENDED</span>`:'')}
       <div class="acts">
         <button class="abtn${picked?' on':''}" data-act="select" title="Select / deselect">${I(picked?'check':'circle',14)}</button>
         <button class="abtn" data-act="copyurl" title="Clip URL copy karein">${I('link',14)}</button>
@@ -918,7 +1008,7 @@ function frameEl(s,c,idx){
 function sceneEl(s,idx){
   const pickedId=selections.get(s.sceneNumber);
   const chips=(s.statusLog||[]).map(t=>
-    `<span class="chip ${t.ok?'ok':'bad'}">${t.name} ${t.ok?'✓':'✗'} ${esc(t.msg)}</span>`).join('');
+    `<span class="chip ${t.ok?'ok':'bad'}" title="fetch time ${t.ms?t.ms.toFixed(1):'?'}s">${t.name} ${t.ok?'✓':'✗'} ${esc(t.msg)}</span>`).join('');
   const art=document.createElement('article');
   art.className='scene'; art.dataset.idx=idx;
   art.innerHTML=`
@@ -940,9 +1030,9 @@ function sceneEl(s,idx){
       <div class="stripwrap">
         <div class="fs-prock top"></div>
         ${s.status==='loading'
-          ?`<div class="strip loading"><span class="ldots">4 SOURCES SEARCH HO RAHI HAIN<span class="d">.</span><span class="d">.</span><span class="d">.</span></span></div>`
+          ?`<div class="strip loading"><span class="ldots">SEARCH SHURU…<span class="d">.</span><span class="d">.</span><span class="d">.</span></span></div>`
           : s.clips.length
-            ?`<div class="strip">${s.clips.map((c,i)=>frameEl(s,c,i)).join('')}</div>`
+            ?`<div class="strip">${s.clips.map(c=>frameEl(s,c)).join('')}</div>`
             :`<div class="strip empty"><p>${esc(s.errors.join(' — ')||'Kisi bhi source par is query ke liye clip nahi mili — query edit kar ke retry karein.')}</p><div class="nlinks">${srcLinks(s.keywords)}</div></div>`}
         <div class="fs-prock bot"></div>
       </div>
@@ -960,9 +1050,19 @@ function renderAll(){
   updateCounts();
 }
 const findClip=(s,id)=>s.clips.find(c=>c.id===id);
+function renderNiche(){
+  const el=$('#nicheStrip');
+  if(state.niche){
+    el.classList.remove('hidden');
+    el.innerHTML=`<span class="ntag">NICHE</span><b>${esc(state.niche.name||'')}</b>`
+      +(state.niche.category?`<span>· ${esc(state.niche.category)}</span>`:'')
+      +(state.niche.style?`<span>· STYLE: ${esc(state.niche.style)}</span>`:'')
+      +(state.niche.notes?`<span class="nnotes">${esc(state.niche.notes)}</span>`:'');
+  }else el.classList.add('hidden');
+}
 function updateCounts(){
   const tot=state.scenes.reduce((a,s)=>a+s.clips.length,0);
-  $('#rmeta').innerHTML=`${pad(state.scenes.length)} SCENES · ${pad(tot)} CLIPS · <b>${pad(selections.size)} PICKED</b>`;
+  $('#rmeta').innerHTML=`${pad(state.scenes.length)} SCENES · ${pad(tot)} CLIPS · <b>${pad(selections.size)} PICKED</b> · HIST ${history.size} · ${state.fmt==='videos'?'FULL VIDEOS':'SHORT CLIPS'}`;
   $('#trayCount').innerHTML=`<b>${pad(selections.size)}</b> CLIPS PICKED`;
   const on=state.scenes.length>0;
   $('#tray').classList.toggle('on',on);
@@ -1029,11 +1129,19 @@ async function reSearch(idx,q){
   s.keywords=cleanQuery(q)||s.keywords;
   s.status='loading';
   list.children[idx].replaceWith(sceneEl(s,idx));
-  await searchScene(s);
+  /* live fetch status — strip ke andar chalti hui source dikhti hai */
+  const onSrc=(name,phase,info)=>{
+    const el=list.children[idx] && list.children[idx].querySelector('.ldots');
+    if(!el) return;
+    if(phase==='start') el.innerHTML=`${name} FETCH HO RAHA HAI<span class="d">.</span><span class="d">.</span><span class="d">.</span>`;
+    else if(info&&!info.ok) el.innerHTML=`${name} ✗ ${esc(info.msg)} — agli source…`;
+  };
+  await searchScene(s,onSrc);
+  if(s.recId&&!history.has(s.recId)){ history.add(s.recId); saveHistory(); }
   s.status='done';
   list.children[idx].replaceWith(sceneEl(s,idx));
   updateCounts();
-  toast(`SC.${pad(s.sceneNumber)} — ${s.clips.length} clips mile`, s.clips.length?'ok':'warn');
+  toast(`SC.${pad(s.sceneNumber)} — ${s.clips.length} clips mile (fresh recommended)`, s.clips.length?'ok':'warn');
 }
 
 /* ================= download — single ================= */
@@ -1061,13 +1169,7 @@ async function downloadClip(clip,s){
 function collectClips(modeZip){
   const out=[]; const seen=new Set();
   state.scenes.forEach(s=>{
-    let cl=[];
-    if(modeZip==='all') cl=s.clips;
-    else{
-      const id=selections.get(s.sceneNumber);
-      const c=(id&&findClip(s,id))||s.clips[0];
-      if(c) cl=[c];
-    }
+    let cl = modeZip==='all' ? s.clips : [getPick(s)].filter(Boolean);
     cl.forEach(c=>{ if(c&&c.download&&!seen.has(c.id)){ seen.add(c.id); out.push({scene:s, clip:c}); } });
   });
   return out;
@@ -1129,17 +1231,19 @@ async function zipClips(modeZip, btn){
 
 /* ================= export ================= */
 function buildTextList(){
-  const L=['CUTLIST — SHOT LIST','Generated: '+new Date().toLocaleString(),''];
+  const L=['CUTLIST — SHOT LIST',
+    'Format : '+(state.fmt==='videos'?'FULL VIDEOS':'SHORT CLIPS'),
+    state.niche?`Niche  : ${state.niche.name||''}${state.niche.style?' ('+state.niche.style+')':''}`:null,
+    'Generated: '+new Date().toLocaleString(),''];
   state.scenes.forEach(s=>{
-    const pickId=selections.get(s.sceneNumber);
-    const c=pickId?findClip(s,pickId):s.clips[0];
+    const c=getPick(s);
     L.push(`SCENE ${pad(s.sceneNumber)}`,
       `Angle  : ${s.script}`,
       `Query  : ${s.keywords}`,
-      c?`Pick   : [${c.source}] ${c.page}${pickId?'':'  (auto-recommended)'}`:'Pick   : — koi clip nahi mili',
+      c?`Pick   : [${c.source}] ${c.page}${(selections.get(s.sceneNumber))?'':'  (fresh recommended)'}`:'Pick   : — koi clip nahi mili',
       `Search : ${srcLinks(s.keywords).replace(/\s+/g,' ').trim()}`,'');
   });
-  return L.join('\n');
+  return L.filter(x=>x!==null).join('\n');
 }
 async function copyList(){
   if(!state.scenes.length) return;
@@ -1154,12 +1258,17 @@ async function copyList(){
 function exportJson(){
   if(!state.scenes.length) return;
   const data={ tool:'CUTLIST', generated:new Date().toISOString(),
-    scenes: state.scenes.map(s=>({
-      sceneNumber:s.sceneNumber, script:s.script, keywords:s.keywords, visual:s.visual,
-      selected:(()=>{ const id=selections.get(s.sceneNumber); const c=id?findClip(s,id):null;
-        return c?{source:c.source,page:c.page,video:c.download}:null; })(),
-      clips:s.clips.map(c=>({source:c.source,page:c.page,preview:c.preview,video:c.download,duration:c.duration,res:c.res}))
-    })) };
+    format:state.fmt, niche:state.niche||null,
+    scenes: state.scenes.map(s=>{
+      const rc=getPick(s);
+      return {
+        sceneNumber:s.sceneNumber, script:s.script, keywords:s.keywords, visual:s.visual,
+        selected:(()=>{ const id=selections.get(s.sceneNumber); const c=id?findClip(s,id):null;
+          return c?{source:c.source,page:c.page,video:c.download}:null; })(),
+        recommended: rc?{source:rc.source,page:rc.page,video:rc.download,duration:rc.duration}:null,
+        clips:s.clips.map(c=>({source:c.source,page:c.page,preview:c.preview,video:c.download,duration:c.duration,res:c.res}))
+      };
+    }) };
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));
   a.download='cutlist-shotlist.json';
@@ -1185,9 +1294,10 @@ async function runPipeline(){
     busy=true; btnGoTopic.disabled=true; btnGoTopic.firstChild.textContent='ROLLING… ';
     switches=0; startOverlay(); setStep(2);
     try{
-      log(`SCRIPT RECEIVED — TOPIC MODE: "${topic}"`);
+      log(`TOPIC RECEIVED — "${topic}"`);
+      log('OUTPUT FORMAT: '+(state.fmt==='videos'?'FULL VIDEOS':'SHORT CLIPS'));
       scenes=await geminiTopicBreakdown(topic);
-      log(`${scenes.length} visual angles tayyar ho gaye`,'ok');
+      log(`${scenes.length} visual angles tayyar — NICHE samajh ke banaye gaye`,'ok');
     }catch(err){
       log(String(err.message||err),'err');
       endOverlay(1500);
@@ -1203,7 +1313,7 @@ async function runPipeline(){
     switches=0; startOverlay(); setStep(2);
     try{
       log(`SCRIPT RECEIVED — ${wordCount(script)} words`);
-      log('GEMINI — script breakdown chal raha hai…');
+      log('OUTPUT FORMAT: '+(state.fmt==='videos'?'FULL VIDEOS':'SHORT CLIPS'));
       scenes=await geminiScriptBreakdown(script);
       log(`${scenes.length} scenes identify ho gaye`,'ok');
     }catch(err){
@@ -1216,23 +1326,31 @@ async function runPipeline(){
     }
   }
 
-  /* shared: clip sourcing */
+  /* shared: clip sourcing — har fetch ka time log mein */
   busy=true; setStep(3);
   try{
     state.scenes=scenes;
     const nSrc=enabledSources().length;
-    log(`Clip chain: ${nSrc} sources (PEXELS → PIXABAY → WIKIMEDIA → ARCHIVE)…`);
+    log(`Clip chain: ${nSrc} sources (PEXELS → PIXABAY → WIKIMEDIA → ARCHIVE) — har fetch ka time log hoga…`);
     for(let i=0;i<state.scenes.length;i+=3){
       const batch=state.scenes.slice(i,i+3);
       await Promise.all(batch.map(async s=>{
-        await searchScene(s);
+        await searchScene(s,(name,phase,info)=>{
+          if(phase==='start') log(`SC.${pad(s.sceneNumber)} · ${name} fetch chal raha hai…`);
+          else if(info && !info.ok && info.ms>2.5) log(`SC.${pad(s.sceneNumber)} · ${name} ✗ ${info.msg}`,'err');
+        });
         const okN=s.statusLog.filter(t=>t.ok).length;
         log(`SC.${pad(s.sceneNumber)} → "${s.keywords}" → ${s.clips.length} clips (${okN}/${s.statusLog.length} sources ok)`, s.clips.length?'ok':'err');
       }));
     }
+    /* fresh recommendations history mein save — dobara recommend nahi hongi */
+    let added=0;
+    state.scenes.forEach(s=>{ if(s.recId && !history.has(s.recId)){ history.add(s.recId); added++; } });
+    if(added){ saveHistory(); log(`HISTORY: +${added} recommended clips save ho gayin — agli dafa ye dobara recommend nahi hongi (total ${history.size})`); }
     selections.clear();
-    renderAll(); setStep(4);
+    renderAll(); renderNiche(); setStep(4);
     $('#stageResults').classList.remove('hidden');
+    log(`TOTAL: ${((performance.now()-t0)/1000).toFixed(1)}s`,'ok');
     log('BREAKDOWN COMPLETE — sheet tayyar hai','ok');
     endOverlay(600);
     setTimeout(()=>{
@@ -1279,6 +1397,10 @@ scriptEl.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key==='Ent
  $('#btnZipAll').addEventListener('click',e=>zipClips('all', e.currentTarget));
  $('#btnZipPicks').addEventListener('click',e=>zipClips('picks', e.currentTarget));
  $('#trayZip').addEventListener('click',e=>zipClips('picks', e.currentTarget));
+ $('#trayHist').addEventListener('click',()=>{
+  history.clear(); saveHistory();
+  toast('History reset — ab purani clips phir recommend ho sakti hain');
+});
  $('#trayClear').addEventListener('click',()=>{
   selections.clear(); renderAll();
   toast('Picks clear ho gaye');
@@ -1286,9 +1408,16 @@ scriptEl.addEventListener('keydown',e=>{ if((e.ctrlKey||e.metaKey)&&e.key==='Ent
 
 /* init */
 loadKeys();
+loadHistory();
+setFmt(localStorage.getItem('cutlist.fmt')||'clips', false);
 scriptEl.value=localStorage.getItem('cutlist.script')||'';
 scriptEl.dispatchEvent(new Event('input'));
 topicEl.value=localStorage.getItem('cutlist.topic')||'';
+try{
+  const saved=JSON.parse(localStorage.getItem('cutlist.niche')||'null');
+  if(saved && saved.niche && saved.topic===topicEl.value.trim().toLowerCase()){ state.niche=saved.niche; }
+}catch(_){}
+renderNiche();
 setStep(1);
 </script>
 </body>
