@@ -278,13 +278,15 @@ body::after{content:"";position:fixed;inset:0;z-index:9999;pointer-events:none;o
       <label>GEMINI — REQUIRED (GOOGLE AI STUDIO)<input type="password" id="kGemini" placeholder="Apni Gemini API key paste karein" autocomplete="off"></label>
       <label>PEXELS — OPTIONAL<input type="password" id="kPexels" placeholder="pexels.com/api se free key" autocomplete="off"></label>
       <label>PIXABAY — OPTIONAL<input type="password" id="kPixabay" placeholder="pixabay.com/api/docs se free key" autocomplete="off"></label>
+      <label>GEMINI MODEL — OPTIONAL<input type="text" id="kModel" placeholder="khaali = auto (latest flash)" autocomplete="off" spellcheck="false"></label>
     </div>
     <p class="kp-note">
-      Keys sirf aapke browser ke localStorage me save hoti hain — kahin bheji nahi jatin (double-click karke show/hide kar sakte hain).
+      Keys sirf aapke browser ke localStorage me save hoti hain — kahin bheji nahi jatin (password fields par double-click karke show/hide kar sakte hain).
       Gemini key <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">Google AI Studio</a> se,
       Pexels key <a href="https://www.pexels.com/api/" target="_blank" rel="noopener">pexels.com/api</a> se aur
       Pixabay key <a href="https://pixabay.com/api/docs/" target="_blank" rel="noopener">pixabay.com/api/docs</a> se free milti hai.
       Pinterest ki koi public video-search API nahi hoti, is liye har scene ke sath direct Pinterest search link diya jata hai.
+      <b>Model field khaali chhoren</b> — tool aapki key par jo latest flash model available ho, khud pakar leta hai (deprecation ka masla khatam).
     </p>
   </div>
 </section>
@@ -395,15 +397,19 @@ document.querySelectorAll('[data-icon]').forEach(el => el.innerHTML = I(el.datas
 /* ================= state & keys ================= */
 const state = { scenes: [] };
 const selections = new Map();          // sceneNumber -> clipId (ek scene = ek pick)
-const keys = { gemini:'', pexels:'', pixabay:'' };
+const keys = { gemini:'', pexels:'', pixabay:'', model:'' };
+
+const kGemini=$('#kGemini'), kPexels=$('#kPexels'), kPixabay=$('#kPixabay'), kModel=$('#kModel');
 
 function loadKeys(){
   try{ Object.assign(keys, JSON.parse(localStorage.getItem('cutlist.keys')||'{}')); }catch(_){}
   kGemini.value=keys.gemini||''; kPexels.value=keys.pexels||''; kPixabay.value=keys.pixabay||'';
+  kModel.value=keys.model||'';
   updateKeyStatus();
 }
 function saveKeys(){
   keys.gemini=kGemini.value.trim(); keys.pexels=kPexels.value.trim(); keys.pixabay=kPixabay.value.trim();
+  keys.model=kModel.value.trim();
   localStorage.setItem('cutlist.keys', JSON.stringify(keys));
   updateKeyStatus();
 }
@@ -482,26 +488,74 @@ function fallbackQuery(script){ // agar AI query na de to script ke pehle 4 lamz
   return (script||'').toLowerCase().replace(/[^\w\s]/g,' ').split(/\s+/).filter(w=>w&&!stop.has(w)).slice(0,4).join(' ');
 }
 
-async function geminiBreakdown(script){
+/* ---------- Gemini v2 — auto model resolution (deprecation-proof) ---------- */
+const GLM_BASE='https://generativelanguage.googleapis.com/v1beta';
+let resolvedModel=null;
+
+async function callGemini(model, prompt){
   let res;
   try{
-    res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${encodeURIComponent(keys.gemini)}`,{
+    res = await fetch(`${GLM_BASE}/models/${model}:generateContent?key=${encodeURIComponent(keys.gemini)}`,{
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
-        contents:[{role:'user', parts:[{text:buildPrompt(script)}]}],
+        contents:[{role:'user', parts:[{text:prompt}]}],
         generationConfig:{ temperature:0.35, responseMimeType:'application/json' }
       })
     });
   }catch(e){ throw new Error('Network error — internet connection check karein. ('+e.message+')'); }
   if(!res.ok){
-    let msg='Gemini request fail ('+res.status+')';
-    try{ const e=await res.json(); if(e.error?.message) msg=e.error.message; }catch(_){}
+    let msg='Gemini request fail ('+res.status+')', raw='';
+    try{ const e=await res.json(); raw=e.error?.message||''; if(raw) msg+=' — '+raw; }catch(_){}
     if(res.status===400||res.status===403) msg+=' — API key check karein';
     if(res.status===429) msg+=' — rate limit, thori der baad koshish karein';
-    throw new Error(msg);
+    const err=new Error(msg); err.raw=raw; throw err;
   }
-  const data=await res.json();
+  return res.json();
+}
+
+/* error message me Google ka suggested model pakdein: "...use models/gemini-3.6-flash..." */
+function suggestedModel(raw){
+  const m=String(raw||'').match(/models\/([a-z0-9._\-]+)/i);
+  return m ? m[1] : null;
+}
+
+/* aapki key par jo flash model live available hai, wahi use ho */
+async function resolveModel(){
+  if(resolvedModel) return resolvedModel;
+  const pref=((keys.model||'').trim()||'gemini-3.6-flash').replace(/^models\//,'');
+  const prefs=[pref,'gemini-flash-latest','gemini-2.5-flash','gemini-2.0-flash'];
+  try{
+    const r=await fetch(`${GLM_BASE}/models?key=${encodeURIComponent(keys.gemini)}&pageSize=100`);
+    if(r.ok){
+      const d=await r.json();
+      const avail=(d.models||[])
+        .filter(m=>(m.supportedGenerationMethods||[]).includes('generateContent'))
+        .map(m=>String(m.name||'').replace(/^models\//,''));
+      for(const c of prefs){ if(avail.includes(c)){ resolvedModel=c; return resolvedModel; } }
+      const anyFlash=avail.filter(a=>a.includes('flash')).sort().pop();
+      if(anyFlash){ resolvedModel=anyFlash; return resolvedModel; }
+    }
+  }catch(_){}
+  resolvedModel=pref;
+  return resolvedModel;
+}
+
+async function geminiBreakdown(script){
+  const prompt=buildPrompt(script);
+  let model=await resolveModel();
+  log('MODEL: '+model);
+  let data;
+  try{
+    data=await callGemini(model,prompt);
+  }catch(e){
+    const sug=suggestedModel(e.raw);   // Google ne replacement model error me bataya ho to khud switch
+    if(sug && sug!==model){
+      log(`${model} unavailable — ${sug} par switch ho gaya`,'err');
+      resolvedModel=sug; model=sug;
+      data=await callGemini(model,prompt);
+    } else { throw e; }
+  }
   let txt=(data?.candidates?.[0]?.content?.parts||[]).map(p=>p.text||'').join('').trim();
   txt=txt.replace(/^```(?:json)?/i,'').replace(/```$/,'').trim();
   let parsed;
@@ -781,7 +835,7 @@ async function runPipeline(){
   startOverlay(); setStep(2);
   try{
     log(`SCRIPT RECEIVED — ${wordCount(script)} words`);
-    log('GEMINI 2.0 FLASH — script breakdown chal raha hai…');
+    log('GEMINI — script breakdown chal raha hai…');
     state.scenes=await geminiBreakdown(script);
     log(`${state.scenes.length} scenes identify ho gaye`,'ok');
     setStep(3);
@@ -812,11 +866,11 @@ async function runPipeline(){
 }
 
 /* ================= bindings ================= */
-const kGemini=$('#kGemini'), kPexels=$('#kPexels'), kPixabay=$('#kPixabay');
 [kGemini,kPexels,kPixabay].forEach(el=>{
   el.addEventListener('input',saveKeys);
   el.addEventListener('dblclick',()=>{ el.type=el.type==='password'?'text':'password'; });
 });
+kModel.addEventListener('input',saveKeys);
  $('#keyBtn').addEventListener('click',()=>$('#keyPanel').classList.toggle('hidden'));
  $('#btnSample').addEventListener('click',()=>{
   scriptEl.value=SAMPLE; scriptEl.dispatchEvent(new Event('input'));
